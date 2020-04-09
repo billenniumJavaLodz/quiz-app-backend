@@ -1,12 +1,14 @@
 package billennium.quizapp.entity;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.Type;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToOne;
 import java.util.UUID;
@@ -15,10 +17,12 @@ import java.util.UUID;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class Candidate {
 
     @Id
-    @Type(type = "pg-uuid")
+    @GeneratedValue
+    @Column(columnDefinition = "uuid", updatable = false)
     private UUID id;
 
     private String email;

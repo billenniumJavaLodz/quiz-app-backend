@@ -13,7 +13,7 @@ import javax.persistence.MappedSuperclass;
 abstract class BaseModel {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
 }
