@@ -1,4 +1,3 @@
-
 package billennium.quizapp.repository;
 
 import billennium.quizapp.entity.Candidate;

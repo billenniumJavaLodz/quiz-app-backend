@@ -1,16 +1,8 @@
 package billennium.quizapp
 
 import billennium.quizapp.controller.QuizController
-import billennium.quizapp.entity.Answer
-import billennium.quizapp.entity.Candidate
-import billennium.quizapp.entity.Question
-import billennium.quizapp.entity.QuizDefinition
-import billennium.quizapp.entity.QuizExecuted
-import billennium.quizapp.repository.AnswerRepository
-import billennium.quizapp.repository.CandidateRepository
-import billennium.quizapp.repository.QuestionRepository
-import billennium.quizapp.repository.QuizDefinitionRepository
-import billennium.quizapp.repository.QuizExecutedRepository
+import billennium.quizapp.entity.*
+import billennium.quizapp.repository.*
 import billennium.quizapp.resource.AnswerDto
 import billennium.quizapp.resource.QuestionDto
 import billennium.quizapp.resource.QuizDefinitionDto
@@ -21,9 +13,7 @@ import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
 import spock.lang.Specification
 
-import static billennium.quizapp.controller.ControllerConstants.USER
-import static billennium.quizapp.controller.ControllerConstants.SLASH
-import static billennium.quizapp.controller.ControllerConstants.QUIZ
+import static billennium.quizapp.controller.ControllerConstants.*
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
