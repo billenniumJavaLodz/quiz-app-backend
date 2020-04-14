@@ -1,7 +1,11 @@
 package billennium.quizapp
 
 import billennium.quizapp.entity.Candidate
+import billennium.quizapp.entity.QuizDefinition
+import billennium.quizapp.entity.QuizExecuted
 import billennium.quizapp.repository.CandidateRepository
+import billennium.quizapp.repository.QuizDefinitionRepository
+import billennium.quizapp.repository.QuizExecutedRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
@@ -22,9 +26,27 @@ class CandidateITSpec extends Specification {
     @Autowired
     private CandidateRepository candidateRepository;
 
+    @Autowired
+    QuizExecutedRepository quizExecutedRepository;
+    @Autowired
+    QuizDefinitionRepository quizDefinitionRepository;
+
     def setup() {
+
+        def quiz = quizDefinitionRepository.save(
+                QuizDefinition.builder()
+                        .title("Zestaw 1")
+                        .build())
+
+        quizDefinitionRepository.save(quiz)
+
+        def userQuiz = quizExecutedRepository.save(QuizExecuted.builder()
+                .quiz(quiz).build())
+        quizExecutedRepository.save(userQuiz)
+
         candidateRepository.save(Candidate.builder()
                 .email("billenet@billennium.com")
+                .quizExecuted(userQuiz)
                 .build())
     }
 
@@ -37,5 +59,7 @@ class CandidateITSpec extends Specification {
 
     def cleanup() {
         candidateRepository.deleteAll();
+        quizExecutedRepository.deleteAll()
+        quizDefinitionRepository.deleteAll()
     }
 }

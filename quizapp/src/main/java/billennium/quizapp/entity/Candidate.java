@@ -27,7 +27,7 @@ public class Candidate {
 
     private String email;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(optional = false, fetch = FetchType.LAZY)
     private QuizExecuted quizExecuted;
 
 }

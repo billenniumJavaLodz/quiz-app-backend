@@ -1,4 +1,4 @@
-allowedOrigin: "http://localhost:4200/"
+allowedOrigin: "http://localhost:4200"
 spring:
   datasource:
     driver-class-name: org.postgresql.Driver
