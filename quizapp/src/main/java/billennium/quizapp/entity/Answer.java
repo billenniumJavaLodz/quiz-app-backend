@@ -2,6 +2,7 @@ package billennium.quizapp.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Type;
@@ -17,6 +18,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class Answer extends BaseModel {
 
     @NotNull(message = "No answer text provided.")
@@ -28,6 +30,5 @@ public class Answer extends BaseModel {
     private List<Question> question;
 
     @Type(type = "true_false")
-    @NotNull
     private Boolean correctAnswer;
 }

@@ -20,7 +20,7 @@ import java.util.List;
 @NoArgsConstructor
 public class QuizExecuted extends BaseModel {
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(optional = false,fetch = FetchType.LAZY)
     @JoinColumn(name = "quiz_id")
     private QuizDefinition quiz;
 

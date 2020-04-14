@@ -12,9 +12,9 @@ import javax.persistence.OneToOne;
 import java.util.UUID;
 
 @Entity
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Data
 public class Candidate {
 
     @Id
@@ -23,7 +23,7 @@ public class Candidate {
 
     private String email;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(optional = false, fetch = FetchType.LAZY)
     private QuizExecuted quizExecuted;
 
 }
