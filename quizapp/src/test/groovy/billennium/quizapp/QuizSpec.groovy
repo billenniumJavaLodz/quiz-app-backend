@@ -13,7 +13,8 @@ import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
 import spock.lang.Specification
 
-import static billennium.quizapp.controller.ControllerConstants.*
+import static billennium.quizapp.controller.ControllerConstants.QUIZ
+import static billennium.quizapp.controller.ControllerConstants.SLASH
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
@@ -105,7 +106,7 @@ class QuizSpec extends Specification {
         model
 
         when:
-        def response = mockMvc.perform(get(USER + SLASH + candidate.id.toString() + QUIZ))
+        def response = mockMvc.perform(get(QUIZ + SLASH + candidate.id.toString()))
         then:
         response.andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(JsonTestUtil.asJsonString(model)))
@@ -117,7 +118,7 @@ class QuizSpec extends Specification {
         model
 
         when:
-        def response = mockMvc.perform(get(USER + SLASH + UUID.randomUUID() + QUIZ))
+        def response = mockMvc.perform(get(QUIZ + SLASH + UUID.randomUUID()))
         then:
         response.andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(JsonTestUtil.asJsonString(QuizDefinitionDto.builder().build())))
