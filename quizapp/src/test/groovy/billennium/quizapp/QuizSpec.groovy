@@ -58,14 +58,14 @@ class QuizSpec extends Specification {
                 .answers(Arrays.asList(answer))
                 .build()
 
-        def quiz = quizDefinitionRepository.save(QuizDefinition.builder()
+        def quiz = QuizDefinition.builder()
                 .title("Java zestaw 1")
                 .questions(Arrays.asList(question))
-                .build())
+                .build()
 
-        def userQuiz = quizExecutedRepository.save(QuizExecuted.builder()
+        def userQuiz = QuizExecuted.builder()
                 .quiz(quiz)
-                .build())
+                .build()
 
         candidate = candidateRepository.save(Candidate.builder()
                 .email("billenet@billennum.com")

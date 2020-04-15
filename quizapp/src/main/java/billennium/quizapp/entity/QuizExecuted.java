@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -22,7 +23,8 @@ import java.util.List;
 @Builder
 public class QuizExecuted extends BaseModel {
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY,
+            cascade = CascadeType.PERSIST)
     @JoinColumn(name = "quiz_id")
     private QuizDefinition quiz;
 
