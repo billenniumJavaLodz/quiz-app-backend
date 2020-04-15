@@ -5,6 +5,7 @@ import billennium.quizapp.entity.QuizDefinition
 import billennium.quizapp.repository.CandidateRepository
 import billennium.quizapp.repository.QuizDefinitionRepository
 import billennium.quizapp.repository.QuizExecutedRepository
+import billennium.quizapp.utils.JsonTestUtil
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
