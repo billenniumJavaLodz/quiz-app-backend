@@ -1,7 +1,6 @@
 package billennium.quizapp.controller;
 
-import billennium.quizapp.entity.QuizExecuted;
-import billennium.quizapp.resource.QuizDefinitionDto;
+import billennium.quizapp.resource.quiz.QuizDefinitionDto;
 import billennium.quizapp.service.QuizService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;

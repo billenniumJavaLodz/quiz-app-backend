@@ -1,4 +1,4 @@
-package billennium.quizapp.resource;
+package billennium.quizapp.resource.quiz;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -2,6 +2,7 @@ package billennium.quizapp.controller;
 
 
 import billennium.quizapp.entity.Candidate;
+import billennium.quizapp.resource.candidate.CandidateEmailDto;
 import billennium.quizapp.service.CandidateService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -28,9 +29,9 @@ public class CandidateController {
         return candidateService.findByEmail(email);
     }
 
-    @PostMapping(path = SAVE_CANDIDATE)
+    @PostMapping(SAVE_CANDIDATE)
     @ResponseStatus(HttpStatus.CREATED)
-    public Candidate saveUser(@RequestBody String email) {
-        return candidateService.save(email);
+    public Candidate saveUser(@RequestBody CandidateEmailDto candidateEmailDto) {
+        return candidateService.save(candidateEmailDto.getEmail());
     }
 }
