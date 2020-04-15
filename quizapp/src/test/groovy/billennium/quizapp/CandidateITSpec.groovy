@@ -4,6 +4,7 @@ import billennium.quizapp.entity.Candidate
 import billennium.quizapp.entity.QuizDefinition
 import billennium.quizapp.repository.CandidateRepository
 import billennium.quizapp.repository.QuizDefinitionRepository
+import billennium.quizapp.repository.QuizExecutedRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
@@ -28,7 +29,11 @@ class CandidateITSpec extends Specification {
     private CandidateRepository candidateRepository;
 
     @Autowired
+    private QuizExecutedRepository quizExecutedRepository
+
+    @Autowired
     private QuizDefinitionRepository quizDefinitionRepository;
+
 
     def setup() {
         candidateRepository.save(Candidate.builder()
@@ -39,7 +44,6 @@ class CandidateITSpec extends Specification {
                 .title("BIG-DATA")
                 .questions(Collections.emptyList())
                 .build())
-
     }
 
     def "Insert a Candidate Entity and retrieve the resulting String via GET /candidate/email"() {
@@ -67,5 +71,7 @@ class CandidateITSpec extends Specification {
 
     def cleanup() {
         candidateRepository.deleteAll();
+        quizExecutedRepository.deleteAll()
+        quizDefinitionRepository.deleteAll()
     }
 }
