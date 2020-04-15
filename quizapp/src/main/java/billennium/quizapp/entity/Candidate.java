@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -22,12 +23,14 @@ public class Candidate {
 
     @Id
     @GeneratedValue
-    @Column(columnDefinition = "uuid", updatable = false)
+    @Column(columnDefinition = "uuid",
+            updatable = false)
     private UUID id;
 
     private String email;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY,
+            cascade = CascadeType.PERSIST)
     private QuizExecuted quizExecuted;
 
 }
