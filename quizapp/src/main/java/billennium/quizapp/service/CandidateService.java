@@ -6,9 +6,12 @@ import billennium.quizapp.exception.CandidateException;
 import billennium.quizapp.exception.QuizDefinitionException;
 import billennium.quizapp.repository.CandidateRepository;
 import billennium.quizapp.repository.QuizDefinitionRepository;
+import billennium.quizapp.resource.candidate.CandidateDto;
 import lombok.RequiredArgsConstructor;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -35,5 +38,14 @@ public class CandidateService {
                                 .build())
                         .build()
         );
+    }
+
+    public CandidateDto getById(UUID id) {
+        Optional<Candidate> candidate = candidateRepository.findById(id);
+        if (candidate.isPresent()) {
+            return new ModelMapper().map(candidate.get(), CandidateDto.class);
+        } else {
+            return new CandidateDto();
+        }
     }
 }
