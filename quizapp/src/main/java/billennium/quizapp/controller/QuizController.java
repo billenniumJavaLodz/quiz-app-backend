@@ -1,10 +1,12 @@
 package billennium.quizapp.controller;
 
+import billennium.quizapp.resource.quiz.AnswersDto;
 import billennium.quizapp.resource.quiz.QuizDefinitionDto;
 import billennium.quizapp.service.QuizService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,8 +20,8 @@ public class QuizController {
 
     private final QuizService quizService;
 
-    @GetMapping(ID_PARAM)
-    public QuizDefinitionDto getQuizFirstQuestion(@PathVariable String id) {
-        return quizService.getFirstQuizQuestion(id);
+    @PostMapping(ID_PARAM)
+    public QuizDefinitionDto playQuiz(@PathVariable String id, @RequestBody AnswersDto answersDto) {
+        return quizService.begin(id, answersDto);
     }
 }

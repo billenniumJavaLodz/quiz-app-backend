@@ -32,7 +32,7 @@ public class QuizExecuted extends BaseModel {
     @JoinColumn(name = "result_id")
     private Result result;
 
-    @OneToMany
+    @OneToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "result_details_id")
     private List<ResultDetails> resultDetails;
 
