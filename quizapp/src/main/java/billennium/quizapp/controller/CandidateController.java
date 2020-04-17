@@ -45,4 +45,6 @@ public class CandidateController {
     public CandidateDto getCandidate(@PathVariable UUID id) {
         return candidateService.getById(id);
     }
+
+
 }

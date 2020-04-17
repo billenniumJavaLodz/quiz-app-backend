@@ -1,11 +1,13 @@
 package billennium.quizapp.repository;
 
 import billennium.quizapp.entity.Candidate;
+import billennium.quizapp.projection.CandidateResultView;
 import billennium.quizapp.projection.QuizExecutedView;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -19,4 +21,11 @@ public interface CandidateRepository extends JpaRepository<Candidate, UUID> {
             " JOIN  quizEexecution.quiz quizD" +
             " where c.id =:uuid")
     QuizExecutedView getCandidateWithQuiz(UUID uuid);
+
+    @Query(value = "SELECT c.email as email, c.id as id, c.quizExecuted.result as quizResult," +
+            " c.quizExecuted.quiz.title as quizTitle FROM Candidate  c " +
+            "join c.quizExecuted quizE " +
+            "join quizE.result " +
+            "where quizE.quizStatus='DONE'")
+    List<CandidateResultView> findAllCandidateWithResult();
 }

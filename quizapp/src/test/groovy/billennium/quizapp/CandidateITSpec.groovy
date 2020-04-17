@@ -1,5 +1,6 @@
 package billennium.quizapp
 
+
 import billennium.quizapp.entity.Candidate
 import billennium.quizapp.entity.QuizDefinition
 import billennium.quizapp.repository.CandidateRepository
@@ -25,18 +26,18 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class CandidateITSpec extends Specification {
 
     @Autowired
-    private MockMvc mockMvc;
+    private MockMvc mockMvc
 
     @Autowired
-    private CandidateRepository candidateRepository;
+    private CandidateRepository candidateRepository
 
     @Autowired
     private QuizExecutedRepository quizExecutedRepository
 
     @Autowired
-    private QuizDefinitionRepository quizDefinitionRepository;
+    private QuizDefinitionRepository quizDefinitionRepository
 
-    def candidateDto;
+    def candidateDto
 
     def setup() {
         def candidate = candidateRepository.save(Candidate.builder()
