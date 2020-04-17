@@ -1,13 +1,16 @@
 package billennium.quizapp.service;
 
+import billennium.quizapp.entity.Answer;
 import billennium.quizapp.entity.Question;
 import billennium.quizapp.entity.QuizDefinition;
 import billennium.quizapp.entity.QuizExecuted;
 import billennium.quizapp.entity.QuizStatus;
+import billennium.quizapp.entity.Result;
 import billennium.quizapp.entity.ResultDetails;
 import billennium.quizapp.exception.QuizDefinitionException;
 import billennium.quizapp.exception.QuizExecutedException;
 import billennium.quizapp.projection.QuizExecutedView;
+import billennium.quizapp.repository.AnswerRepository;
 import billennium.quizapp.repository.CandidateRepository;
 import billennium.quizapp.repository.QuizExecutedRepository;
 import billennium.quizapp.resource.quiz.AnswerDto;
@@ -30,6 +33,7 @@ public class QuizService {
 
     private final CandidateRepository candidateRepository;
     private final QuizExecutedRepository quizExecutedRepository;
+    private final AnswerRepository answerRepository;
 
     public QuizDefinitionDto begin(String candidateId, AnswersDto answersDto) {
         QuizExecutedView queryResult = candidateRepository.getCandidateWithQuiz(UUID.fromString(candidateId));
@@ -75,7 +79,25 @@ public class QuizService {
 
     private QuizDefinitionDto finishQuiz(QuizExecuted quizExecuted) {
         quizExecuted.setQuizStatus(QuizStatus.DONE);
+        checkAnswers(quizExecuted);
         return QuizDefinitionDto.builder().build();
+    }
+
+    void checkAnswers(QuizExecuted quizExecuted) {
+        int sumCorrectAnswers = 0;
+        for (ResultDetails answer : quizExecuted.getResultDetails()) {
+            Boolean correctAnswer = answerRepository.findById(answer.getGivenAnswerId())
+                    .map(Answer::getCorrectAnswer)
+                    .orElseThrow(QuizDefinitionException::new);
+
+            if (correctAnswer) {
+                sumCorrectAnswers++;
+            }
+        }
+        quizExecuted.setResult(Result.builder()
+                .totalQuestions(quizExecuted.getResultDetails().size())
+                .correctQuestions(sumCorrectAnswers)
+                .build());
     }
 
     private void changeStatusQuizExecuted(Long quizExecutedId) {
