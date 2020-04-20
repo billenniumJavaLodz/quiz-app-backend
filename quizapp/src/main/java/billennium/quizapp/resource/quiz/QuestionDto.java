@@ -15,4 +15,5 @@ public class QuestionDto {
     private Long id;
     private String text;
     private List<AnswerDto> answers;
+    private Integer timeToAnswer;
 }

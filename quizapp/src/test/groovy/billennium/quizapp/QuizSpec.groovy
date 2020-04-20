@@ -4,10 +4,10 @@ import billennium.quizapp.controller.QuizController
 import billennium.quizapp.entity.*
 import billennium.quizapp.repository.*
 import billennium.quizapp.resource.quiz.AnswerDto
+import billennium.quizapp.resource.quiz.AnswersDto
 import billennium.quizapp.resource.quiz.QuestionDto
 import billennium.quizapp.resource.quiz.QuizDefinitionDto
 import billennium.quizapp.utils.JsonTestUtil
-import org.junit.Ignore
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
@@ -17,14 +17,12 @@ import spock.lang.Specification
 
 import static billennium.quizapp.controller.ControllerConstants.QUIZ
 import static billennium.quizapp.controller.ControllerConstants.SLASH
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @SpringBootTest
 @AutoConfigureMockMvc
-//TODO tests to update
-@Ignore
 class QuizSpec extends Specification {
 
     @Autowired
@@ -47,9 +45,19 @@ class QuizSpec extends Specification {
     @Autowired
     private QuizExecutedRepository quizExecutedRepository
 
+    @Autowired
+    private ResultRepository resultRepository
+
+
     def candidate
 
-    def model;
+    def responseModelWithFirstQuestion
+
+    def responseModelEndQuiz
+
+    def defaultAnswerModelPost
+
+    def answerModelPost
 
     def setup() {
 
@@ -60,6 +68,7 @@ class QuizSpec extends Specification {
 
         def question = Question.builder()
                 .text("Testowe pytanie")
+                .timeToAnswerInSeconds(3)
                 .answers(Arrays.asList(answer))
                 .build()
 
@@ -78,53 +87,87 @@ class QuizSpec extends Specification {
                 .build())
 
         def answerDto = AnswerDto.builder()
-                .id(1)
+                .id(answer.id)
                 .text("Testowa Odpowiedz")
                 .build()
 
         def questionDto = QuestionDto.builder()
-                .id(1l)
+                .id(question.id)
                 .text("Testowe pytanie")
                 .answers(Collections.singletonList(answerDto))
+                .timeToAnswer(3)
                 .build()
 
-        model = QuizDefinitionDto.builder().
-                id(1l)
+        responseModelWithFirstQuestion = QuizDefinitionDto.builder().
+                id(userQuiz.id)
                 .numberOfQuestions(1)
-                .actualQuestion(0)
+                .actualQuestion(1)
                 .question(questionDto)
+                .build()
+
+        responseModelEndQuiz = QuizDefinitionDto.builder().build()
+
+        defaultAnswerModelPost = AnswersDto.builder()
+                .answerId(null)
+                .questionId(null)
+                .build()
+
+        answerModelPost = AnswersDto.builder()
+                .questionId(question.id)
+                .answerId(answer.id)
                 .build()
     }
 
     def cleanup() {
         candidateRepository.deleteAll()
         quizExecutedRepository.deleteAll()
+        resultRepository.deleteAll()
         quizDefinitionRepository.deleteAll()
         questionRepository.deleteAll()
         answerRepository.deleteAll()
     }
 
-    def "when Get in user/uuid/quiz then response status 200 with content"() {
-        given: "A Candidate Entity and response excepting model"
+    def "solving quiz in post quiz/uuid"() {
+        given: "A Candidate Entity, default post body request,  excepting response body with first question, post body request with answer and default body response"
         candidate
-        model
+        defaultAnswerModelPost
+        responseModelWithFirstQuestion
+        answerModelPost
+        responseModelEndQuiz
 
         when:
-        def response = mockMvc.perform(get(QUIZ + SLASH + candidate.id.toString()))
+        def firstResponse = mockMvc.perform(post(QUIZ + SLASH + candidate.id.toString())
+                .contentType(MediaType.APPLICATION_JSON).content(JsonTestUtil.asJsonString(defaultAnswerModelPost)))
+        def secondResponse = mockMvc.perform(post(QUIZ + SLASH + candidate.id.toString())
+                .contentType(MediaType.APPLICATION_JSON).content(JsonTestUtil.asJsonString(answerModelPost)))
+        def result = resultRepository.findById(1l)
         then:
-        response.andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content().json(JsonTestUtil.asJsonString(model)))
+        firstResponse.andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(JsonTestUtil.asJsonString(responseModelWithFirstQuestion)))
+        secondResponse.andExpect(status().is2xxSuccessful()).andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().json(JsonTestUtil.asJsonString(responseModelEndQuiz)))
+        result.get().totalQuestions == 1
+        result.get().correctQuestions == 1
     }
 
-    def "when Get with bad uuid  in user/uuid/quiz then response status 200 with default content"() {
-        given: "A Candidate Entity and response excepting model"
+    def "solving quiz with answer after resolve time  in post quiz/uuid"() {
+        given: "A Candidate Entity, default post body request,  excepting response body with first question, post body request with answer and default body response"
         candidate
-        model
+        defaultAnswerModelPost
+        responseModelWithFirstQuestion
+        answerModelPost
+        responseModelEndQuiz
 
         when:
-        def response = mockMvc.perform(get(QUIZ + SLASH + UUID.randomUUID()))
+        mockMvc.perform(post(QUIZ + SLASH + candidate.id.toString())
+                .contentType(MediaType.APPLICATION_JSON).content(JsonTestUtil.asJsonString(defaultAnswerModelPost)))
+        Thread.sleep(7000)
+        mockMvc.perform(post(QUIZ + SLASH + candidate.id.toString())
+                .contentType(MediaType.APPLICATION_JSON).content(JsonTestUtil.asJsonString(answerModelPost)))
+        def result = resultRepository.findById(2l)
         then:
-        response.andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(content().json(JsonTestUtil.asJsonString(QuizDefinitionDto.builder().build())))
+        result.get().totalQuestions == 1
+        result.get().correctQuestions == 0
     }
+
 }

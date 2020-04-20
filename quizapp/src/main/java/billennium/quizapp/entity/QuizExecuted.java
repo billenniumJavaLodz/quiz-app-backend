@@ -28,7 +28,7 @@ public class QuizExecuted extends BaseModel {
     @JoinColumn(name = "quiz_id")
     private QuizDefinition quiz;
 
-    @OneToOne(fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "result_id")
     private Result result;
 

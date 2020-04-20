@@ -33,26 +33,31 @@ public class DataLoader implements ApplicationRunner {
         Question question1 = Question.builder()
                 .text("Java to:")
                 .answers(createListAnswersForQuestion("Język programowania", "JVM", "C++"))
+                .timeToAnswerInSeconds(5)
                 .build();
         Question question2 = Question.builder()
                 .text("JVM TO")
                 .answers(createListAnswersForQuestion("JRE", "JDK", "JAVA VIRTUAL MACHINE"))
+                .timeToAnswerInSeconds(6)
                 .build();
         Question question3 = Question.builder()
                 .text("Co to jest konstruktor domyślny?")
                 .answers(createListAnswersForQuestion("Jest tworzony jeśli nie zdefiniowano jawnie konstruktora w klasie",
                         "Jest tworzony tylko wtedy kiedy zostanie jawnie zdefiniowany w kodzie",
                         "Konstruktor zdefiniowany ze słowem kluczowym default"))
+                .timeToAnswerInSeconds(5)
                 .build();
         Question question4 = Question.builder()
                 .text("Czy można zmienić istniejący String?")
                 .answers(createListAnswersForQuestion("Tylko za pomocą StringBuilder-a", "NIE", "Tak," +
                         " jak każdy inny obiekt"))
+                .timeToAnswerInSeconds(4)
                 .build();
         Question question5 = Question.builder()
                 .text("Czy klasa może dziedziczyć kilka interfejsów?")
                 .answers(createListAnswersForQuestion("Tylko wtedy jak interfejsy roszerzają jeden wspólny interfejs",
                         "NIE", "TAK"))
+                .timeToAnswerInSeconds(5)
                 .build();
 
         return Arrays.asList(question1, question2, question3, question4, question5);

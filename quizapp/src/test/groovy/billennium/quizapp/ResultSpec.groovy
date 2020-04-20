@@ -61,10 +61,10 @@ class ResultSpec extends Specification {
                 .questions(Arrays.asList(question))
                 .build()
 
-        def result = resultRepository.save(Result.builder()
+        def result = Result.builder()
                 .totalQuestions(1)
                 .correctQuestions(1)
-                .build())
+                .build()
 
         def userQuiz = QuizExecuted.builder()
                 .quiz(quiz)

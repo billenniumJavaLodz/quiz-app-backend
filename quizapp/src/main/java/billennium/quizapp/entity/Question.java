@@ -27,6 +27,8 @@ public class Question extends BaseModel {
     @Column(columnDefinition = "TEXT")
     private String text;
 
+    private Integer timeToAnswerInSeconds;
+
     @ManyToMany(cascade = {
             CascadeType.PERSIST,
             CascadeType.MERGE
