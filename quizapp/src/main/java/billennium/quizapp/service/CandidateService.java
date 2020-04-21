@@ -2,8 +2,10 @@ package billennium.quizapp.service;
 
 import billennium.quizapp.entity.Candidate;
 import billennium.quizapp.entity.QuizExecuted;
+import billennium.quizapp.entity.QuizStatus;
 import billennium.quizapp.exception.CandidateException;
 import billennium.quizapp.exception.QuizDefinitionException;
+import billennium.quizapp.projection.CandidateWithQuizStatusView;
 import billennium.quizapp.repository.CandidateRepository;
 import billennium.quizapp.repository.QuizDefinitionRepository;
 import billennium.quizapp.resource.candidate.CandidateDto;
@@ -35,15 +37,18 @@ public class CandidateService {
                         .quizExecuted(QuizExecuted.builder()
                                 //TODO The quiz selection is temporary and requires expansion
                                 .quiz(quizDefinitionRepository.findAll().stream().findAny().orElseThrow(QuizDefinitionException::new))
+                                .quizStatus(QuizStatus.READY)
                                 .build())
                         .build()
         );
     }
 
     public CandidateDto getById(UUID id) {
-        Optional<Candidate> candidate = candidateRepository.findById(id);
-        if (candidate.isPresent()) {
-            return new ModelMapper().map(candidate.get(), CandidateDto.class);
+        Optional<CandidateWithQuizStatusView> queryResult = candidateRepository.findByIdWithQuizStatus(id);
+        if (queryResult.isPresent()) {
+            CandidateDto candidateDto = new ModelMapper().map(queryResult.get().getCandidate(), CandidateDto.class);
+            candidateDto.setQuizStatus(queryResult.get().getQuizStatus());
+            return candidateDto;
         } else {
             return new CandidateDto();
         }

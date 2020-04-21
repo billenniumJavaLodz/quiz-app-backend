@@ -3,6 +3,8 @@ package billennium.quizapp
 
 import billennium.quizapp.entity.Candidate
 import billennium.quizapp.entity.QuizDefinition
+import billennium.quizapp.entity.QuizExecuted
+import billennium.quizapp.entity.QuizStatus
 import billennium.quizapp.repository.CandidateRepository
 import billennium.quizapp.repository.QuizDefinitionRepository
 import billennium.quizapp.repository.QuizExecutedRepository
@@ -40,18 +42,22 @@ class CandidateITSpec extends Specification {
     def candidateDto
 
     def setup() {
+
+        def quizExecuted = QuizExecuted.builder()
+                .quizStatus(QuizStatus.READY)
+                .quiz(QuizDefinition.builder()
+                        .title("BIG-DATA")
+                        .questions(Collections.emptyList())
+                        .build())
+                .build()
         def candidate = candidateRepository.save(Candidate.builder()
                 .email("billenet@billennium.com")
+                .quizExecuted(quizExecuted)
                 .build())
-
-        quizDefinitionRepository.save(QuizDefinition.builder()
-                .title("BIG-DATA")
-                .questions(Collections.emptyList())
-                .build())
-
         candidateDto = CandidateDto.builder()
                 .email(candidate.email)
                 .id(candidate.id.toString())
+                .quizStatus("READY")
                 .build()
     }
 
