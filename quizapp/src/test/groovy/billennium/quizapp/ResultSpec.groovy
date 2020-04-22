@@ -12,6 +12,7 @@ import org.springframework.test.web.servlet.MockMvc
 import spock.lang.Specification
 
 import static billennium.quizapp.controller.ControllerConstants.RESULT
+import static billennium.quizapp.controller.ControllerConstants.SLASH
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
@@ -44,6 +45,8 @@ class ResultSpec extends Specification {
 
     def resultDto
 
+    def candidate
+
     def setup() {
 
         def answer = Answer.builder()
@@ -72,18 +75,18 @@ class ResultSpec extends Specification {
                 .quizStatus(QuizStatus.DONE)
                 .build()
 
-        def candidate = candidateRepository.save(Candidate.builder()
+        candidate = candidateRepository.save(Candidate.builder()
                 .email("billenet@billennum.com")
                 .quizExecuted(userQuiz)
                 .build())
 
-        resultDto = Arrays.asList(CandidateResultDto.builder()
+        resultDto = CandidateResultDto.builder()
                 .totalPoints(result.totalQuestions)
                 .scoredPoints(result.correctQuestions)
                 .quizTitle(quiz.title)
                 .id(candidate.id)
                 .email(candidate.email)
-                .build())
+                .build()
 
     }
 
@@ -92,6 +95,16 @@ class ResultSpec extends Specification {
         resultDto
         when:
         def response = mockMvc.perform(get(RESULT))
+        then:
+        response.andExpect(status().is2xxSuccessful()).andExpect(content().json(JsonTestUtil.asJsonString(Arrays.asList(resultDto))))
+    }
+
+    def "when get result/uuid then response content with 200 http status"() {
+        given:
+        resultDto
+        def uuid = candidateRepository.findByEmail("billenet@billennum.com")
+        when:
+        def response = mockMvc.perform(get(RESULT + SLASH + uuid.get().id))
         then:
         response.andExpect(status().is2xxSuccessful()).andExpect(content().json(JsonTestUtil.asJsonString(resultDto)))
     }

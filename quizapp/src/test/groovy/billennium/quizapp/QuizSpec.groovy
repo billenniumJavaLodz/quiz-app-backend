@@ -3,10 +3,7 @@ package billennium.quizapp
 import billennium.quizapp.controller.QuizController
 import billennium.quizapp.entity.*
 import billennium.quizapp.repository.*
-import billennium.quizapp.resource.quiz.AnswerDto
-import billennium.quizapp.resource.quiz.AnswersDto
-import billennium.quizapp.resource.quiz.QuestionDto
-import billennium.quizapp.resource.quiz.QuizDefinitionDto
+import billennium.quizapp.resource.quiz.*
 import billennium.quizapp.utils.JsonTestUtil
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -15,8 +12,7 @@ import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
 import spock.lang.Specification
 
-import static billennium.quizapp.controller.ControllerConstants.QUIZ
-import static billennium.quizapp.controller.ControllerConstants.SLASH
+import static billennium.quizapp.controller.ControllerConstants.*
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
@@ -59,6 +55,10 @@ class QuizSpec extends Specification {
 
     def answerModelPost
 
+    def quizEndDto
+
+    long quizExecutedId
+
     def setup() {
 
         def answer = Answer.builder()
@@ -79,6 +79,7 @@ class QuizSpec extends Specification {
 
         def userQuiz = QuizExecuted.builder()
                 .quiz(quiz)
+                .quizStatus(QuizStatus.READY)
                 .build()
 
         candidate = candidateRepository.save(Candidate.builder()
@@ -116,6 +117,12 @@ class QuizSpec extends Specification {
                 .questionId(question.id)
                 .answerId(answer.id)
                 .build()
+
+        quizEndDto = QuizEndDto.builder()
+                .quizId(candidate.quizExecuted.id)
+                .build()
+
+        quizExecutedId = userQuiz.id
     }
 
     def cleanup() {
@@ -170,4 +177,16 @@ class QuizSpec extends Specification {
         result.get().correctQuestions == 0
     }
 
+
+    def "when post to quiz/stop quiz status change status to done"() {
+        given:
+        candidate
+        quizEndDto
+        when:
+        def response = mockMvc.perform(post(QUIZ + STOP_QUIZ).contentType(MediaType.APPLICATION_JSON)
+                .content(JsonTestUtil.asJsonString(quizEndDto)))
+        then:
+        response.andExpect(status().is2xxSuccessful())
+        quizExecutedRepository.findById(quizExecutedId).get().getQuizStatus().equals(QuizStatus.DONE)
+    }
 }

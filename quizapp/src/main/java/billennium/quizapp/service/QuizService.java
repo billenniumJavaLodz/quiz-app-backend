@@ -17,6 +17,7 @@ import billennium.quizapp.resource.quiz.AnswerDto;
 import billennium.quizapp.resource.quiz.AnswersDto;
 import billennium.quizapp.resource.quiz.QuestionDto;
 import billennium.quizapp.resource.quiz.QuizDefinitionDto;
+import billennium.quizapp.resource.quiz.QuizEndDto;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -108,7 +109,7 @@ public class QuizService {
             }
         }
         quizExecuted.setResult(Result.builder()
-                .totalQuestions(quizExecuted.getResultDetails().size())
+                .totalQuestions(quizExecuted.getQuiz().getQuestions().size())
                 .correctQuestions(sumCorrectAnswers)
                 .build());
     }
@@ -149,5 +150,13 @@ public class QuizService {
 
     private boolean checkDate(LocalDateTime now, LocalDateTime timeLimit) {
         return now.isBefore(timeLimit) || now.isEqual(timeLimit);
+    }
+
+    public void stopQuiz(QuizEndDto quizEndDto) {
+        Optional<QuizExecuted> quizToStop = quizExecutedRepository.findById(quizEndDto.getQuizId());
+        quizToStop.ifPresent(quiz -> {
+            quiz.setQuizStatus(QuizStatus.DONE);
+            checkAnswers(quiz);
+        });
     }
 }

@@ -8,6 +8,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Service
@@ -29,5 +31,18 @@ public class ResultService {
             resultDto.setScoredPoints(result.getQuizResult().getCorrectQuestions());
             return resultDto;
         }).collect(Collectors.toList());
+    }
+
+    public CandidateResultDto getCandidateResultDtoById(UUID id) {
+        Optional<CandidateResultView> candidateResultView = candidateRepository.findCandidateWithResult(id);
+        if (candidateResultView.isPresent()) {
+            CandidateResultDto candidateResultDto = new ModelMapper()
+                    .map(candidateResultView.get(), CandidateResultDto.class);
+            candidateResultDto.setScoredPoints(candidateResultView.get().getQuizResult().getCorrectQuestions());
+            candidateResultDto.setTotalPoints(candidateResultView.get().getQuizResult().getTotalQuestions());
+            return candidateResultDto;
+        } else {
+            return CandidateResultDto.builder().build();
+        }
     }
 }
