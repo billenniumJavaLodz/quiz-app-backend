@@ -7,7 +7,7 @@ plugins {
 
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '11'
+sourceCompatibility = '8'
 
 configurations {
     compileOnly {
@@ -16,7 +16,11 @@ configurations {
 }
 
 jar {
-    enabled = true
+    manifest {
+        attributes(
+                'Main-Class': 'billennium.quizapp.QuizApplication'
+        )
+    }
 }
 
 repositories {
@@ -41,7 +45,9 @@ dependencies {
 test {
     useJUnitPlatform()
 }
-
+task stage {
+    dependsOn build
+}
 project(':quiz-loader') {
 
     apply plugin: 'java'

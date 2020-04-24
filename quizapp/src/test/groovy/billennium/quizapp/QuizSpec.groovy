@@ -61,42 +61,49 @@ class QuizSpec extends Specification {
 
     def setup() {
 
-        def answer = Answer.builder()
+        def answer = answerRepository.save(Answer.builder()
                 .text("Testowa Odpowiedz")
                 .correctAnswer(true)
-                .build()
+                .build())
 
-        def question = Question.builder()
+        def question = questionRepository.save(Question.builder()
                 .text("Testowe pytanie")
                 .timeToAnswerInSeconds(3)
-                .answers(Arrays.asList(answer))
-                .build()
+                .answers(Collections.emptyList())
+                .build())
+        question.answers = Arrays.asList(answer)
+        questionRepository.save(question)
 
-        def quiz = QuizDefinition.builder()
+        def quiz = quizDefinitionRepository.save(QuizDefinition.builder()
                 .title("Java zestaw 1")
-                .questions(Arrays.asList(question))
-                .build()
+                .questions(Collections.emptyList())
+                .build())
+        quiz.questions = Arrays.asList(question)
+        quizDefinitionRepository.save(quiz)
 
-        def userQuiz = QuizExecuted.builder()
-                .quiz(quiz)
+        def userQuiz = quizExecutedRepository.save(QuizExecuted.builder()
                 .quizStatus(QuizStatus.READY)
                 .build()
+        )
+        userQuiz.quiz = quiz
+        quizExecutedRepository.save(userQuiz)
 
         candidate = candidateRepository.save(Candidate.builder()
                 .email("billenet@billennum.com")
-                .quizExecuted(userQuiz)
                 .build())
+        candidate.quizExecuted = userQuiz
+        candidateRepository.save(candidate)
 
         def answerDto = AnswerDto.builder()
                 .id(answer.id)
-                .text("Testowa Odpowiedz")
+                .text(answer.text)
                 .build()
 
         def questionDto = QuestionDto.builder()
                 .id(question.id)
-                .text("Testowe pytanie")
+                .text(question.text)
                 .answers(Collections.singletonList(answerDto))
-                .timeToAnswer(3)
+                .timeToAnswer(question.timeToAnswerInSeconds)
                 .build()
 
         responseModelWithFirstQuestion = QuizDefinitionDto.builder().
@@ -147,14 +154,14 @@ class QuizSpec extends Specification {
                 .contentType(MediaType.APPLICATION_JSON).content(JsonTestUtil.asJsonString(defaultAnswerModelPost)))
         def secondResponse = mockMvc.perform(post(QUIZ + SLASH + candidate.id.toString())
                 .contentType(MediaType.APPLICATION_JSON).content(JsonTestUtil.asJsonString(answerModelPost)))
-        def result = resultRepository.findById(1l)
+        def result = resultRepository.findAll().get(0)
         then:
         firstResponse.andExpect(status().isOk()).andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(JsonTestUtil.asJsonString(responseModelWithFirstQuestion)))
         secondResponse.andExpect(status().is2xxSuccessful()).andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().json(JsonTestUtil.asJsonString(responseModelEndQuiz)))
-        result.get().totalQuestions == 1
-        result.get().correctQuestions == 1
+        result.totalQuestions == 1
+        result.correctQuestions == 1
     }
 
     def "solving quiz with answer after resolve time  in post quiz/uuid"() {
@@ -171,10 +178,10 @@ class QuizSpec extends Specification {
         Thread.sleep(7000)
         mockMvc.perform(post(QUIZ + SLASH + candidate.id.toString())
                 .contentType(MediaType.APPLICATION_JSON).content(JsonTestUtil.asJsonString(answerModelPost)))
-        def result = resultRepository.findById(2l)
+        def result = resultRepository.findAll().get(0)
         then:
-        result.get().totalQuestions == 1
-        result.get().correctQuestions == 0
+        result.totalQuestions == 1
+        result.correctQuestions == 0
     }
 
 

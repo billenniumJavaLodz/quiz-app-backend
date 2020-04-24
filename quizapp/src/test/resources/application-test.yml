@@ -1,4 +1,4 @@
-allowedOrigin: '"http://localhost:4200/"'
+allowedOrigin: ' '
 spring:
   datasource:
     driverClassName: org.h2.Driver
