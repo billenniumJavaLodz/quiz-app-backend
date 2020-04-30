@@ -9,6 +9,7 @@ public class ControllerConstants {
     public static final String EMAIL_PARAM = "/{email}";
     public static final String QUIZ = "/quiz";
     public static final String STOP_QUIZ = "/stop";
+    public static final String QUESTION = "/question";
     public static final String SLASH = "/";
 
     private ControllerConstants() {

@@ -3,7 +3,11 @@ package billennium.quizapp
 import billennium.quizapp.controller.QuizController
 import billennium.quizapp.entity.*
 import billennium.quizapp.repository.*
-import billennium.quizapp.resource.quiz.*
+import billennium.quizapp.resource.answer.AnswerDto
+import billennium.quizapp.resource.answer.AnswersDto
+import billennium.quizapp.resource.question.QuestionDto
+import billennium.quizapp.resource.quiz.QuizDefinitionDto
+import billennium.quizapp.resource.quiz.QuizEndDto
 import billennium.quizapp.utils.JsonTestUtil
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc

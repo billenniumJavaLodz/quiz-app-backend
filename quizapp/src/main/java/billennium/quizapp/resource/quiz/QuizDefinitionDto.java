@@ -1,5 +1,6 @@
 package billennium.quizapp.resource.quiz;
 
+import billennium.quizapp.resource.question.QuestionDto;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

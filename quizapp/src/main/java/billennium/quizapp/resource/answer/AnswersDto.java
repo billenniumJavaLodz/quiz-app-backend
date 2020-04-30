@@ -1,4 +1,4 @@
-package billennium.quizapp.resource.quiz;
+package billennium.quizapp.resource.answer;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,7 +9,9 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class AnswerDto {
-    private Long id;
-    private String text;
+public class AnswersDto {
+
+    private Long questionId;
+    private Long answerId;
+
 }

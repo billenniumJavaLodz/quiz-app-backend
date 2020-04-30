@@ -31,31 +31,39 @@ public class DataLoader implements ApplicationRunner {
 
     private List<Question> createListQuestions() {
         Question question1 = Question.builder()
-                .text("Java to:")
+                .text("<p>Java to:</p>")
                 .answers(createListAnswersForQuestion("Język programowania", "JVM", "C++"))
                 .timeToAnswerInSeconds(5)
                 .build();
         Question question2 = Question.builder()
-                .text("JVM TO")
+                .text("<p>JVM TO</p>")
                 .answers(createListAnswersForQuestion("JRE", "JDK", "JAVA VIRTUAL MACHINE"))
                 .timeToAnswerInSeconds(6)
                 .build();
         Question question3 = Question.builder()
-                .text("Co to jest konstruktor domyślny?")
+                .text("<p>Co to jest konstruktor domyślny?</p>")
                 .answers(createListAnswersForQuestion("Jest tworzony jeśli nie zdefiniowano jawnie konstruktora w klasie",
                         "Jest tworzony tylko wtedy kiedy zostanie jawnie zdefiniowany w kodzie",
                         "Konstruktor zdefiniowany ze słowem kluczowym default"))
                 .timeToAnswerInSeconds(5)
                 .build();
         Question question4 = Question.builder()
-                .text("Czy można zmienić istniejący String?")
+                .text("<p>Czy można zmienić istniejący String?</p>")
                 .answers(createListAnswersForQuestion("Tylko za pomocą StringBuilder-a", "NIE", "Tak," +
                         " jak każdy inny obiekt"))
                 .timeToAnswerInSeconds(4)
                 .build();
         Question question5 = Question.builder()
-                .text("Czy klasa może dziedziczyć kilka interfejsów?")
-                .answers(createListAnswersForQuestion("Tylko wtedy jak interfejsy roszerzają jeden wspólny interfejs",
+                .text("<p>Czy wymagane jest utworzenie getterów oraz setterów dla poniższej klasy?&nbsp;</p><pre><code class=\"language-java\">@Data\n" +
+                        "@Builder\n" +
+                        "@AllArgsConstructor\n" +
+                        "@NoArgsConstructor\n" +
+                        "public class AnswerDto {\n" +
+                        "    private Long id;\n" +
+                        "    private String text;\n" +
+                        "}\n" +
+                        "</code></pre>")
+                .answers(createListAnswersForQuestion("Nie wiem",
                         "NIE", "TAK"))
                 .timeToAnswerInSeconds(5)
                 .build();

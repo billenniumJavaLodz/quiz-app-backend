@@ -1,21 +1,15 @@
 package billennium.quizapp.service;
 
-import billennium.quizapp.entity.Answer;
-import billennium.quizapp.entity.Question;
-import billennium.quizapp.entity.QuizDefinition;
-import billennium.quizapp.entity.QuizExecuted;
-import billennium.quizapp.entity.QuizStatus;
-import billennium.quizapp.entity.Result;
-import billennium.quizapp.entity.ResultDetails;
+import billennium.quizapp.entity.*;
 import billennium.quizapp.exception.QuizDefinitionException;
 import billennium.quizapp.exception.QuizExecutedException;
 import billennium.quizapp.projection.QuizExecutedView;
 import billennium.quizapp.repository.AnswerRepository;
 import billennium.quizapp.repository.CandidateRepository;
 import billennium.quizapp.repository.QuizExecutedRepository;
-import billennium.quizapp.resource.quiz.AnswerDto;
-import billennium.quizapp.resource.quiz.AnswersDto;
-import billennium.quizapp.resource.quiz.QuestionDto;
+import billennium.quizapp.resource.answer.AnswerDto;
+import billennium.quizapp.resource.answer.AnswersDto;
+import billennium.quizapp.resource.question.QuestionDto;
 import billennium.quizapp.resource.quiz.QuizDefinitionDto;
 import billennium.quizapp.resource.quiz.QuizEndDto;
 import lombok.RequiredArgsConstructor;
@@ -40,6 +34,7 @@ public class QuizService {
 
     private static final long REQUEST_DELAY_TIME = 3;
     private static final long ANSWER_AFTER_TIME = 0;
+    private static final int FIRST_QUESTION = 1;
 
     public QuizDefinitionDto begin(String candidateId, AnswersDto answersDto) {
         QuizExecutedView queryResult = candidateRepository.getCandidateWithQuiz(UUID.fromString(candidateId));
@@ -55,7 +50,7 @@ public class QuizService {
         if (answersDTO.getQuestionId() == null) {
             changeStatusQuizExecuted(quizExecutedId);
             Question firstQuestion = quiz.getQuestions().stream().findFirst().orElseThrow(QuizDefinitionException::new);
-            return createQuizDefinitionDto(quizExecutedId, firstQuestion, quiz, firstQuestion.getId());
+            return createQuizDefinitionDto(quizExecutedId, firstQuestion, quiz);
         } else {
             return goToNextQuestion(quizExecutedId, answersDTO, quiz);
         }
@@ -85,7 +80,7 @@ public class QuizService {
             return finishQuiz(quizExecuted);
         } else {
             Question nextQuestion = quiz.getQuestions().get(quizExecuted.getResultDetails().size());
-            return createQuizDefinitionDto(quizExecuted.getId(), nextQuestion, quiz, nextQuestion.getId());
+            return createQuizDefinitionDto(quizExecuted.getId(), nextQuestion, quiz);
         }
     }
 
@@ -120,9 +115,8 @@ public class QuizService {
         );
     }
 
-    private QuizDefinitionDto createQuizDefinitionDto(Long quizExecutedId, Question question, QuizDefinition quiz,
-                                                      Long actualQuestion) {
-        setTimeToResolve(quizExecutedId, question);
+    private QuizDefinitionDto createQuizDefinitionDto(Long quizExecutedId, Question question, QuizDefinition quiz) {
+        int actualQuestion = setTimeToResolve(quizExecutedId, question);
         List<AnswerDto> answerDtoList = question.getAnswers().stream().map(answer ->
                 new ModelMapper().map(answer, AnswerDto.class)
         ).collect(Collectors.toList());
@@ -135,17 +129,18 @@ public class QuizService {
                 .id(quizExecutedId)
                 .question(questionModel)
                 .numberOfQuestions(quiz.getQuestions().size())
-                .actualQuestion(Math.toIntExact(actualQuestion))
+                .actualQuestion(actualQuestion)
                 .build();
     }
 
-    private void setTimeToResolve(Long quizExecutedId, Question question) {
+    private int setTimeToResolve(Long quizExecutedId, Question question) {
         QuizExecuted quizExecuted = quizExecutedRepository.findById(quizExecutedId)
                 .orElseThrow(QuizExecutedException::new);
         quizExecuted.getResultDetails().add(ResultDetails.builder()
                 .questionId(question.getId())
                 .timeToResolve(LocalDateTime.now().plusSeconds(question.getTimeToAnswerInSeconds() + REQUEST_DELAY_TIME))
                 .build());
+        return quizExecuted.getResultDetails().size();
     }
 
     private boolean checkDate(LocalDateTime now, LocalDateTime timeLimit) {

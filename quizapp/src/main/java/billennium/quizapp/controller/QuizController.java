@@ -1,6 +1,6 @@
 package billennium.quizapp.controller;
 
-import billennium.quizapp.resource.quiz.AnswersDto;
+import billennium.quizapp.resource.answer.AnswersDto;
 import billennium.quizapp.resource.quiz.QuizDefinitionDto;
 import billennium.quizapp.resource.quiz.QuizEndDto;
 import billennium.quizapp.service.QuizService;
