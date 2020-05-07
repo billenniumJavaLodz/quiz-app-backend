@@ -10,6 +10,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @SuperBuilder(toBuilder = true)
 public class QuestionBaseDto {
-    Long id;
-    String text;
+    private Long id;
+    private String text;
+    private Integer timeToAnswer;
 }

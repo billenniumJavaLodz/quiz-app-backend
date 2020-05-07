@@ -4,10 +4,10 @@ import billennium.quizapp.entity.Answer
 import billennium.quizapp.entity.Question
 import billennium.quizapp.repository.AnswerRepository
 import billennium.quizapp.repository.QuestionRepository
-import billennium.quizapp.resource.answer.AnswerDto
+import billennium.quizapp.resource.answer.AnswerGetDto
 import billennium.quizapp.resource.answer.AnswerToSaveDto
-import billennium.quizapp.resource.question.QuestionBaseDto
-import billennium.quizapp.resource.question.QuestionDto
+import billennium.quizapp.resource.question.QuestionGetDto
+import billennium.quizapp.resource.question.QuestionPageDto
 import billennium.quizapp.resource.question.QuestionToSaveDto
 import billennium.quizapp.utils.JsonTestUtil
 import org.springframework.beans.factory.annotation.Autowired
@@ -37,7 +37,7 @@ class QuestionSpec extends Specification {
     @Autowired
     AnswerRepository answerRepository
 
-    def questionBaseDto
+    def questionPageDto
 
     def questionToSaveDto
 
@@ -57,18 +57,23 @@ class QuestionSpec extends Specification {
         question.answers = Arrays.asList(answer)
         questionRepository.save(question)
 
-        questionBaseDto = QuestionBaseDto.builder().id(question.id).text(question.text).build()
-
-        def answerDto = AnswerDto.builder()
+        def answerDto = AnswerGetDto.builder()
                 .text(answer.text)
-                .id(answer.id).build()
+                .id(answer.id)
+                .correctAnswer(true)
+                .build()
 
-        questionDto = QuestionDto.builder()
+        questionDto = QuestionGetDto.builder()
                 .id(question.id)
                 .text(question.text)
                 .timeToAnswer(question.timeToAnswerInSeconds)
                 .answers(Arrays.asList(answerDto))
                 .build()
+
+        questionPageDto = QuestionPageDto.builder()
+                .pageNumber(0)
+                .pageSize(20)
+                .totalElements(1).questions(Arrays.asList(questionDto)).build()
 
         def firstAnswerToSave = AnswerToSaveDto.builder().text("Test1").correctAnswer(false).build()
         def secondAnswerToSave = AnswerToSaveDto.builder().text("Test").correctAnswer(true).build()
@@ -85,12 +90,14 @@ class QuestionSpec extends Specification {
 
     def " when get via /question then return all question"() {
         given:
-        questionBaseDto
+        questionPageDto
         when:
-        def response = mockMvc.perform(get(QUESTION))
+        def response = mockMvc.perform(get(QUESTION)
+                .param("pageSize", "20")
+                .param("pageNumber", "0"))
         then:
         response.andExpect(status().is2xxSuccessful())
-                .andExpect(content().json(JsonTestUtil.asJsonString(Arrays.asList(questionBaseDto))))
+                .andExpect(content().json(JsonTestUtil.asJsonString(questionPageDto)))
     }
 
     def "when post /question then return 200 without content"() {

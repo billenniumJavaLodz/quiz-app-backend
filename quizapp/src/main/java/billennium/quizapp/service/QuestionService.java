@@ -4,11 +4,13 @@ import billennium.quizapp.entity.Answer;
 import billennium.quizapp.entity.Question;
 import billennium.quizapp.repository.AnswerRepository;
 import billennium.quizapp.repository.QuestionRepository;
-import billennium.quizapp.resource.question.QuestionBaseDto;
-import billennium.quizapp.resource.question.QuestionDto;
+import billennium.quizapp.resource.question.QuestionGetDto;
+import billennium.quizapp.resource.question.QuestionPageDto;
 import billennium.quizapp.resource.question.QuestionToSaveDto;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
@@ -54,14 +56,22 @@ public class QuestionService {
         });
     }
 
-    public List<QuestionBaseDto> getQuestions() {
-        return questionRepository.findAll().stream()
-                .map(question -> new ModelMapper().map(question, QuestionBaseDto.class))
+    public QuestionPageDto getQuestions(Integer pageSize, Integer pageNumber) {
+
+        Page<Question> questionPage = questionRepository.findAll(PageRequest.of(pageNumber, pageSize));
+        List<QuestionGetDto> questionList = questionPage.getContent().stream()
+                .map(question -> new ModelMapper().map(question, QuestionGetDto.class))
                 .collect(Collectors.toList());
+
+        return QuestionPageDto.builder()
+                .pageNumber(questionPage.getPageable().getPageNumber())
+                .pageSize(questionPage.getPageable().getPageSize())
+                .totalElements(questionPage.getTotalElements())
+                .questions(questionList).build();
     }
 
-    public QuestionDto getQuestionById(Long id) {
-        return questionRepository.findById(id).map(question -> new ModelMapper().map(question, QuestionDto.class))
-                .orElse(QuestionDto.builder().build());
+    public QuestionGetDto getQuestionById(Long id) {
+        return questionRepository.findById(id).map(question -> new ModelMapper().map(question, QuestionGetDto.class))
+                .orElse(QuestionGetDto.builder().build());
     }
 }

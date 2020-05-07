@@ -1,6 +1,5 @@
 package billennium.quizapp.resource.question;
 
-import billennium.quizapp.resource.answer.AnswerDto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -12,7 +11,10 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder(toBuilder = true)
-public class QuestionDto extends QuestionBaseDto {
-    private List<AnswerDto> answers;
+public class QuestionPageDto {
+    private Long totalElements;
+    private Integer pageNumber;
+    private Integer pageSize;
+    private List<QuestionGetDto> questions;
 
 }

@@ -9,7 +9,6 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder(toBuilder = true)
 @AllArgsConstructor
 @NoArgsConstructor
-public class AnswerDto {
-    private Long id;
-    private String text;
+public class AnswerGetDto extends AnswerDto {
+    private boolean correctAnswer;
 }
