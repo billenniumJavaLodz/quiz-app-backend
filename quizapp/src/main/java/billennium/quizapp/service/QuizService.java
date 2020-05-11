@@ -1,17 +1,27 @@
 package billennium.quizapp.service;
 
-import billennium.quizapp.entity.*;
+import billennium.quizapp.entity.Answer;
+import billennium.quizapp.entity.Question;
+import billennium.quizapp.entity.QuizDefinition;
+import billennium.quizapp.entity.QuizExecuted;
+import billennium.quizapp.entity.QuizStatus;
+import billennium.quizapp.entity.Result;
+import billennium.quizapp.entity.ResultDetails;
 import billennium.quizapp.exception.QuizDefinitionException;
 import billennium.quizapp.exception.QuizExecutedException;
 import billennium.quizapp.projection.QuizExecutedView;
 import billennium.quizapp.repository.AnswerRepository;
 import billennium.quizapp.repository.CandidateRepository;
+import billennium.quizapp.repository.QuestionRepository;
+import billennium.quizapp.repository.QuizDefinitionRepository;
 import billennium.quizapp.repository.QuizExecutedRepository;
 import billennium.quizapp.resource.answer.AnswerDto;
 import billennium.quizapp.resource.answer.AnswersDto;
+import billennium.quizapp.resource.question.QuestionBaseDto;
 import billennium.quizapp.resource.question.QuestionDto;
 import billennium.quizapp.resource.quiz.QuizDefinitionDto;
 import billennium.quizapp.resource.quiz.QuizEndDto;
+import billennium.quizapp.resource.quiz.QuizToSaveDto;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -31,6 +41,8 @@ public class QuizService {
     private final CandidateRepository candidateRepository;
     private final QuizExecutedRepository quizExecutedRepository;
     private final AnswerRepository answerRepository;
+    private final QuestionRepository questionRepository;
+    private final QuizDefinitionRepository quizDefinitionRepository;
 
     private static final long REQUEST_DELAY_TIME = 3;
     private static final long ANSWER_AFTER_TIME = 0;
@@ -153,5 +165,18 @@ public class QuizService {
             quiz.setQuizStatus(QuizStatus.DONE);
             checkAnswers(quiz);
         });
+    }
+
+    public Long addQuiz(QuizToSaveDto quizToSaveDto) {
+        return quizDefinitionRepository.save(QuizDefinition.builder()
+                .title(quizToSaveDto.getTitle())
+                .questions(mapQuestions(quizToSaveDto.getQuestions())).build()
+        ).getId();
+    }
+
+    private List<Question> mapQuestions(List<QuestionBaseDto> questions) {
+        return questions.stream().map(question ->
+                questionRepository.findById(question.getId()).orElseThrow(RuntimeException::new)
+        ).collect(Collectors.toList());
     }
 }

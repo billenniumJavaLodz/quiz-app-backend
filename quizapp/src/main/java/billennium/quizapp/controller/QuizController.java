@@ -3,6 +3,7 @@ package billennium.quizapp.controller;
 import billennium.quizapp.resource.answer.AnswersDto;
 import billennium.quizapp.resource.quiz.QuizDefinitionDto;
 import billennium.quizapp.resource.quiz.QuizEndDto;
+import billennium.quizapp.resource.quiz.QuizToSaveDto;
 import billennium.quizapp.service.QuizService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -30,5 +31,10 @@ public class QuizController {
     @PostMapping(STOP_QUIZ)
     public void stopQuiz(@RequestBody QuizEndDto stopQuizDto) {
         quizService.stopQuiz(stopQuizDto);
+    }
+
+    @PostMapping
+    public Long addQuiz(@RequestBody QuizToSaveDto quizToSaveDto) {
+        return quizService.addQuiz(quizToSaveDto);
     }
 }

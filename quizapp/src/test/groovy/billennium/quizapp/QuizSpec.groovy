@@ -5,9 +5,11 @@ import billennium.quizapp.entity.*
 import billennium.quizapp.repository.*
 import billennium.quizapp.resource.answer.AnswerDto
 import billennium.quizapp.resource.answer.AnswersDto
+import billennium.quizapp.resource.question.QuestionBaseDto
 import billennium.quizapp.resource.question.QuestionDto
 import billennium.quizapp.resource.quiz.QuizDefinitionDto
 import billennium.quizapp.resource.quiz.QuizEndDto
+import billennium.quizapp.resource.quiz.QuizToSaveDto
 import billennium.quizapp.utils.JsonTestUtil
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -37,7 +39,7 @@ class QuizSpec extends Specification {
     private AnswerRepository answerRepository
 
     @Autowired
-    private QuestionRepository questionRepository;
+    private QuestionRepository questionRepository
 
     @Autowired
     private QuizDefinitionRepository quizDefinitionRepository
@@ -62,6 +64,10 @@ class QuizSpec extends Specification {
     def quizEndDto
 
     long quizExecutedId
+
+    def questionBaseDto
+
+    def quizToSaveDto
 
     def setup() {
 
@@ -134,6 +140,15 @@ class QuizSpec extends Specification {
                 .build()
 
         quizExecutedId = userQuiz.id
+
+        questionBaseDto = QuestionBaseDto.builder()
+                .id(question.id)
+                .build()
+
+        quizToSaveDto = QuizToSaveDto.builder()
+                .title("Test1")
+                .questions(Arrays.asList(questionBaseDto))
+                .build()
     }
 
     def cleanup() {
@@ -199,5 +214,16 @@ class QuizSpec extends Specification {
         then:
         response.andExpect(status().is2xxSuccessful())
         quizExecutedRepository.findById(quizExecutedId).get().getQuizStatus().equals(QuizStatus.DONE)
+    }
+
+    def "when post to /quiz then save new quiz to db"() {
+        given:
+        quizToSaveDto
+        when:
+        def response = mockMvc.perform(post(QUIZ)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonTestUtil.asJsonString(quizToSaveDto)))
+        then:
+        response.andExpect(status().is2xxSuccessful())
     }
 }
