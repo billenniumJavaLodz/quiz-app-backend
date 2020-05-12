@@ -3,13 +3,16 @@ package billennium.quizapp.controller;
 import billennium.quizapp.resource.answer.AnswersDto;
 import billennium.quizapp.resource.quiz.QuizDefinitionDto;
 import billennium.quizapp.resource.quiz.QuizEndDto;
+import billennium.quizapp.resource.quiz.QuizPage;
 import billennium.quizapp.resource.quiz.QuizToSaveDto;
 import billennium.quizapp.service.QuizService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import static billennium.quizapp.controller.ControllerConstants.ID_PARAM;
@@ -36,5 +39,10 @@ public class QuizController {
     @PostMapping
     public Long addQuiz(@RequestBody QuizToSaveDto quizToSaveDto) {
         return quizService.addQuiz(quizToSaveDto);
+    }
+
+    @GetMapping
+    public QuizPage getQuizzes(@RequestParam Integer pageSize, @RequestParam Integer pageNumber) {
+        return quizService.getQuizzes(pageSize, pageNumber);
     }
 }

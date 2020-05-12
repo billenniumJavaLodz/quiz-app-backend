@@ -19,11 +19,15 @@ import billennium.quizapp.resource.answer.AnswerDto;
 import billennium.quizapp.resource.answer.AnswersDto;
 import billennium.quizapp.resource.question.QuestionBaseDto;
 import billennium.quizapp.resource.question.QuestionDto;
+import billennium.quizapp.resource.quiz.QuizBaseDto;
 import billennium.quizapp.resource.quiz.QuizDefinitionDto;
 import billennium.quizapp.resource.quiz.QuizEndDto;
+import billennium.quizapp.resource.quiz.QuizPage;
 import billennium.quizapp.resource.quiz.QuizToSaveDto;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -178,5 +182,23 @@ public class QuizService {
         return questions.stream().map(question ->
                 questionRepository.findById(question.getId()).orElseThrow(RuntimeException::new)
         ).collect(Collectors.toList());
+    }
+
+    public QuizPage getQuizzes(Integer pageSize, Integer pageNumber) {
+        Page<QuizDefinition> quizDefinitionPage = quizDefinitionRepository.findAll(PageRequest.of(pageNumber, pageSize));
+        List<QuizBaseDto> quizBaseDtos = quizDefinitionPage.getContent().stream()
+                .map(quizDefinition -> {
+                    QuizBaseDto quizBaseDto = new ModelMapper().map(quizDefinition, QuizBaseDto.class);
+                    quizBaseDto.setNumberOfQuestions(quizDefinition.getQuestions().size());
+                    quizBaseDto.setTotalTime(quizDefinition.getQuestions().stream()
+                            .mapToInt(Question::getTimeToAnswerInSeconds).sum());
+                    return quizBaseDto;
+                })
+                .collect(Collectors.toList());
+
+        return QuizPage.builder().pageNumber(quizDefinitionPage.getPageable().getPageNumber())
+                .pageSize(quizDefinitionPage.getPageable().getPageSize())
+                .totalElements(quizDefinitionPage.getTotalElements())
+                .quizzes(quizBaseDtos).build();
     }
 }

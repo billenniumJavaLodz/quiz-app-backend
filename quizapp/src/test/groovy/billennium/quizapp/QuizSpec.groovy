@@ -7,9 +7,7 @@ import billennium.quizapp.resource.answer.AnswerDto
 import billennium.quizapp.resource.answer.AnswersDto
 import billennium.quizapp.resource.question.QuestionBaseDto
 import billennium.quizapp.resource.question.QuestionDto
-import billennium.quizapp.resource.quiz.QuizDefinitionDto
-import billennium.quizapp.resource.quiz.QuizEndDto
-import billennium.quizapp.resource.quiz.QuizToSaveDto
+import billennium.quizapp.resource.quiz.*
 import billennium.quizapp.utils.JsonTestUtil
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -19,6 +17,7 @@ import org.springframework.test.web.servlet.MockMvc
 import spock.lang.Specification
 
 import static billennium.quizapp.controller.ControllerConstants.*
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
@@ -68,6 +67,8 @@ class QuizSpec extends Specification {
     def questionBaseDto
 
     def quizToSaveDto
+
+    def quizPage
 
     def setup() {
 
@@ -149,6 +150,21 @@ class QuizSpec extends Specification {
                 .title("Test1")
                 .questions(Arrays.asList(questionBaseDto))
                 .build()
+
+
+        def quizBaseDto = QuizBaseDto.builder()
+                .id(quiz.id)
+                .title(quiz.title)
+                .totalTime(question.timeToAnswerInSeconds)
+                .numberOfQuestions(quiz.questions.size())
+                .build()
+
+        quizPage = QuizPage.builder()
+                .totalElements(1)
+                .pageSize(20)
+                .pageNumber(0)
+                .quizzes(Arrays.asList(quizBaseDto))
+                .build()
     }
 
     def cleanup() {
@@ -225,5 +241,16 @@ class QuizSpec extends Specification {
                 .content(JsonTestUtil.asJsonString(quizToSaveDto)))
         then:
         response.andExpect(status().is2xxSuccessful())
+    }
+
+    def "when get to /quiz with params then return page of quizzes"() {
+        given:
+        quizPage
+        when:
+        def response = mockMvc.perform(get(QUIZ).param("pageSize", "20")
+                .param("pageNumber", "0"))
+        then:
+        response.andExpect(status().is2xxSuccessful())
+                .andExpect(content().json(JsonTestUtil.asJsonString(quizPage)))
     }
 }

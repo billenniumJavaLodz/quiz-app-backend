@@ -9,6 +9,7 @@ import billennium.quizapp.projection.CandidateWithQuizStatusView;
 import billennium.quizapp.repository.CandidateRepository;
 import billennium.quizapp.repository.QuizDefinitionRepository;
 import billennium.quizapp.resource.candidate.CandidateDto;
+import com.google.common.collect.Lists;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -36,7 +37,7 @@ public class CandidateService {
                         .email(email)
                         .quizExecuted(QuizExecuted.builder()
                                 //TODO The quiz selection is temporary and requires expansion
-                                .quiz(quizDefinitionRepository.findAll().stream().findAny().orElseThrow(QuizDefinitionException::new))
+                                .quiz(Lists.newArrayList(quizDefinitionRepository.findAll()).stream().findAny().orElseThrow(QuizDefinitionException::new))
                                 .quizStatus(QuizStatus.READY)
                                 .build())
                         .build()
