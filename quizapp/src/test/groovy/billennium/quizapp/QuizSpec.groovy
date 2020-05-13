@@ -4,9 +4,11 @@ import billennium.quizapp.controller.QuizController
 import billennium.quizapp.entity.*
 import billennium.quizapp.repository.*
 import billennium.quizapp.resource.answer.AnswerDto
+import billennium.quizapp.resource.answer.AnswerGetDto
 import billennium.quizapp.resource.answer.AnswersDto
 import billennium.quizapp.resource.question.QuestionBaseDto
 import billennium.quizapp.resource.question.QuestionDto
+import billennium.quizapp.resource.question.QuestionGetDto
 import billennium.quizapp.resource.quiz.*
 import billennium.quizapp.utils.JsonTestUtil
 import org.springframework.beans.factory.annotation.Autowired
@@ -69,6 +71,10 @@ class QuizSpec extends Specification {
     def quizToSaveDto
 
     def quizPage
+
+    def quizDefinitionId
+
+    def quizGetDto
 
     def setup() {
 
@@ -165,6 +171,30 @@ class QuizSpec extends Specification {
                 .pageNumber(0)
                 .quizzes(Arrays.asList(quizBaseDto))
                 .build()
+
+        quizDefinitionId = quiz.id
+
+        def answerGetDto = AnswerGetDto.builder()
+                .id(answer.id)
+                .correctAnswer(answer.correctAnswer)
+                .text(answer.text)
+                .build()
+
+        def questionGetDto = QuestionGetDto.builder()
+                .id(question.id)
+                .text(question.text)
+                .timeToAnswer(question.timeToAnswerInSeconds)
+                .answers(Arrays.asList(answerGetDto))
+                .build()
+
+        quizGetDto = QuizGetDto.builder()
+                .id(quiz.id)
+                .title(quiz.title)
+                .totalTime(question.timeToAnswerInSeconds)
+                .numberOfQuestions(quiz.getQuestions().size())
+                .questions(Arrays.asList(questionGetDto))
+                .build()
+
     }
 
     def cleanup() {
@@ -252,5 +282,17 @@ class QuizSpec extends Specification {
         then:
         response.andExpect(status().is2xxSuccessful())
                 .andExpect(content().json(JsonTestUtil.asJsonString(quizPage)))
+    }
+
+    def " when get quiz/{id} then return quiz"() {
+        given:
+        quizDefinitionId
+        quizGetDto
+        when:
+        def response = mockMvc.perform(get(QUIZ + SLASH + quizDefinitionId))
+        then:
+        response.andExpect(status().is2xxSuccessful())
+                .andExpect(content().json(JsonTestUtil.asJsonString(quizGetDto)))
+
     }
 }

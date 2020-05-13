@@ -3,6 +3,7 @@ package billennium.quizapp.controller;
 import billennium.quizapp.resource.answer.AnswersDto;
 import billennium.quizapp.resource.quiz.QuizDefinitionDto;
 import billennium.quizapp.resource.quiz.QuizEndDto;
+import billennium.quizapp.resource.quiz.QuizGetDto;
 import billennium.quizapp.resource.quiz.QuizPage;
 import billennium.quizapp.resource.quiz.QuizToSaveDto;
 import billennium.quizapp.service.QuizService;
@@ -44,5 +45,10 @@ public class QuizController {
     @GetMapping
     public QuizPage getQuizzes(@RequestParam Integer pageSize, @RequestParam Integer pageNumber) {
         return quizService.getQuizzes(pageSize, pageNumber);
+    }
+
+    @GetMapping(ID_PARAM)
+    public QuizGetDto getQuiz(@PathVariable Long id) {
+        return quizService.getQuizById(id);
     }
 }

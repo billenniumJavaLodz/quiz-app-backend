@@ -22,6 +22,7 @@ import billennium.quizapp.resource.question.QuestionDto;
 import billennium.quizapp.resource.quiz.QuizBaseDto;
 import billennium.quizapp.resource.quiz.QuizDefinitionDto;
 import billennium.quizapp.resource.quiz.QuizEndDto;
+import billennium.quizapp.resource.quiz.QuizGetDto;
 import billennium.quizapp.resource.quiz.QuizPage;
 import billennium.quizapp.resource.quiz.QuizToSaveDto;
 import lombok.RequiredArgsConstructor;
@@ -200,5 +201,15 @@ public class QuizService {
                 .pageSize(quizDefinitionPage.getPageable().getPageSize())
                 .totalElements(quizDefinitionPage.getTotalElements())
                 .quizzes(quizBaseDtos).build();
+    }
+
+    public QuizGetDto getQuizById(Long id) {
+        return quizDefinitionRepository.findById(id).map(quizDefinition -> {
+            QuizGetDto quizGetDto = new ModelMapper().map(quizDefinition, QuizGetDto.class);
+            quizGetDto.setNumberOfQuestions(quizDefinition.getQuestions().size());
+            quizGetDto.setTotalTime(quizDefinition.getQuestions().stream()
+                    .mapToInt(Question::getTimeToAnswerInSeconds).sum());
+            return quizGetDto;
+        }).orElseGet(QuizGetDto::new);
     }
 }
