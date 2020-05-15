@@ -2,6 +2,7 @@ package billennium.quizapp.service;
 
 import billennium.quizapp.entity.Answer;
 import billennium.quizapp.entity.Question;
+import billennium.quizapp.entity.QuizDefinition;
 import billennium.quizapp.repository.AnswerRepository;
 import billennium.quizapp.repository.QuestionRepository;
 import billennium.quizapp.resource.question.QuestionGetDto;
@@ -11,7 +12,9 @@ import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.transaction.Transactional;
 import java.util.Collections;
@@ -21,7 +24,6 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-
 public class QuestionService {
     private final QuestionRepository questionRepository;
     private final AnswerRepository answerRepository;
@@ -73,5 +75,18 @@ public class QuestionService {
     public QuestionGetDto getQuestionById(Long id) {
         return questionRepository.findById(id).map(question -> new ModelMapper().map(question, QuestionGetDto.class))
                 .orElse(QuestionGetDto.builder().build());
+    }
+
+    public void deleteQuestionById(Long id) {
+        Optional<Question> quizDefinition = questionRepository.findById(id);
+        if (quizDefinition.isPresent()) {
+            if (quizDefinition.get().getQuiz().isEmpty()) {
+                questionRepository.delete(quizDefinition.get());
+            } else {
+                String quizzes = quizDefinition.get().getQuiz().stream()
+                        .map(QuizDefinition::getTitle).collect(Collectors.toList()).toString();
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Nie można usunąć pytania, ponieważ należy ono do quziu/ów: " + quizzes);
+            }
+        }
     }
 }
