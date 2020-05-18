@@ -8,9 +8,11 @@ import billennium.quizapp.repository.QuestionRepository
 import billennium.quizapp.repository.QuizDefinitionRepository
 import billennium.quizapp.resource.answer.AnswerGetDto
 import billennium.quizapp.resource.answer.AnswerToSaveDto
+import billennium.quizapp.resource.answer.AnswerToUpdateDto
 import billennium.quizapp.resource.question.QuestionGetDto
 import billennium.quizapp.resource.question.QuestionPageDto
 import billennium.quizapp.resource.question.QuestionToSaveDto
+import billennium.quizapp.resource.question.QuestionToUpdateDto
 import billennium.quizapp.utils.JsonTestUtil
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -50,6 +52,8 @@ class QuestionSpec extends Specification {
     def question
 
     def questionInQuiz
+
+    def questionToUpdate
 
     def setup() {
         def answer = answerRepository.save(Answer.builder()
@@ -102,6 +106,17 @@ class QuestionSpec extends Specification {
         quiz.questions = Arrays.asList(questionInQuiz)
         quizDefinitionRepository.save(quiz)
 
+        def answerToUpdate = AnswerToUpdateDto.builder()
+                .text("UpdateAnswer")
+                .correctAnswer(false)
+                .build()
+
+        questionToUpdate = QuestionToUpdateDto.builder()
+                .text("Update")
+                .id(question.id)
+                .timeToAnswer(999)
+                .answers(Arrays.asList(answerToUpdate))
+                .build()
 
     }
 
@@ -161,5 +176,15 @@ class QuestionSpec extends Specification {
         def response = mockMvc.perform(delete(QUESTION + SLASH + questionInQuiz.id))
         then:
         response.andExpect(status().is4xxClientError())
+    }
+
+    def "when put /question then return 204 status Code"() {
+        given:
+        questionToUpdate
+        when:
+        def response = mockMvc.perform(put(QUESTION)
+                .contentType(MediaType.APPLICATION_JSON).content(JsonTestUtil.asJsonString(questionToUpdate)))
+        then:
+        response.andExpect(status().is2xxSuccessful())
     }
 }

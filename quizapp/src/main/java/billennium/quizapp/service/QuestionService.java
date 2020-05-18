@@ -8,6 +8,7 @@ import billennium.quizapp.repository.QuestionRepository;
 import billennium.quizapp.resource.question.QuestionGetDto;
 import billennium.quizapp.resource.question.QuestionPageDto;
 import billennium.quizapp.resource.question.QuestionToSaveDto;
+import billennium.quizapp.resource.question.QuestionToUpdateDto;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
@@ -88,5 +89,19 @@ public class QuestionService {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "Nie można usunąć pytania, ponieważ należy ono do quziu/ów: " + quizzes);
             }
         }
+    }
+
+    public void updateQuestion(QuestionToUpdateDto questionToUpdate) {
+        questionRepository.findById(questionToUpdate.getId()).ifPresent(question -> {
+            List<Answer> answers = questionToUpdate.getAnswers().stream()
+                    .map(answerToUpdateDto -> new ModelMapper().map(answerToUpdateDto, Answer.class))
+                    .collect(Collectors.toList());
+
+            checkAnswersExisting(answers);
+            question.setAnswers(answers);
+            question.setText(questionToUpdate.getText());
+            question.setTimeToAnswerInSeconds(questionToUpdate.getTimeToAnswer());
+            questionRepository.save(question);
+        });
     }
 }
