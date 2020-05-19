@@ -9,6 +9,7 @@ import billennium.quizapp.repository.CandidateRepository
 import billennium.quizapp.repository.QuizDefinitionRepository
 import billennium.quizapp.repository.QuizExecutedRepository
 import billennium.quizapp.resource.candidate.CandidateDto
+import billennium.quizapp.resource.candidate.CandidateToSaveDto
 import billennium.quizapp.utils.JsonTestUtil
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -41,6 +42,8 @@ class CandidateITSpec extends Specification {
 
     def candidateDto
 
+    def candidateEmailDto
+
     def setup() {
 
         def quizExecuted = QuizExecuted.builder()
@@ -59,6 +62,11 @@ class CandidateITSpec extends Specification {
                 .id(candidate.id.toString())
                 .quizStatus("READY")
                 .build()
+
+        candidateEmailDto = CandidateToSaveDto.builder()
+                .email(candidate.email)
+                .quizId(quizExecuted.quiz.id)
+                .build()
     }
 
     def "Insert a Candidate Entity and retrieve the resulting String via GET /candidate/email"() {
@@ -70,14 +78,12 @@ class CandidateITSpec extends Specification {
 
     def 'should return 201 code (created) when trying to save record'() {
         given:
-        Map request = [
-                email: 'john.wayne@gmail.com'
-        ]
+        candidateEmailDto
 
         when: 'try to save candidate'
         def response = mockMvc.perform(post(CANDIDATE)
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(JsonTestUtil.asJsonString(request)))
+                .content(JsonTestUtil.asJsonString(candidateEmailDto)))
 
         then:
         response.andExpect(status().isCreated())

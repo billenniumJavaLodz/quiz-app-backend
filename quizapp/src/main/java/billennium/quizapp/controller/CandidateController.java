@@ -1,9 +1,8 @@
 package billennium.quizapp.controller;
 
 
-import billennium.quizapp.entity.Candidate;
 import billennium.quizapp.resource.candidate.CandidateDto;
-import billennium.quizapp.resource.candidate.CandidateEmailDto;
+import billennium.quizapp.resource.candidate.CandidateToSaveDto;
 import billennium.quizapp.service.CandidateService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -37,8 +36,8 @@ public class CandidateController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Candidate saveCandidate(@RequestBody CandidateEmailDto candidateEmailDto) {
-        return candidateService.save(candidateEmailDto.getEmail());
+    public UUID saveCandidate(@RequestBody CandidateToSaveDto candidateToSaveDto) {
+        return candidateService.save(candidateToSaveDto);
     }
 
     @GetMapping(ID_PARAM + EMAIL)

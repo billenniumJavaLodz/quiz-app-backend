@@ -4,12 +4,11 @@ import billennium.quizapp.entity.Candidate;
 import billennium.quizapp.entity.QuizExecuted;
 import billennium.quizapp.entity.QuizStatus;
 import billennium.quizapp.exception.CandidateException;
-import billennium.quizapp.exception.QuizDefinitionException;
 import billennium.quizapp.projection.CandidateWithQuizStatusView;
 import billennium.quizapp.repository.CandidateRepository;
 import billennium.quizapp.repository.QuizDefinitionRepository;
 import billennium.quizapp.resource.candidate.CandidateDto;
-import com.google.common.collect.Lists;
+import billennium.quizapp.resource.candidate.CandidateToSaveDto;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -31,17 +30,16 @@ public class CandidateService {
                 .orElseThrow(CandidateException::new);
     }
 
-    public Candidate save(String email) {
+    public UUID save(CandidateToSaveDto candidateToSaveDto) {
         return candidateRepository.save(
                 Candidate.builder()
-                        .email(email)
+                        .email(candidateToSaveDto.getEmail())
                         .quizExecuted(QuizExecuted.builder()
-                                //TODO The quiz selection is temporary and requires expansion
-                                .quiz(Lists.newArrayList(quizDefinitionRepository.findAll()).stream().findAny().orElseThrow(QuizDefinitionException::new))
+                                .quiz(quizDefinitionRepository.findById(candidateToSaveDto.getQuizId()).get())
                                 .quizStatus(QuizStatus.READY)
                                 .build())
                         .build()
-        );
+        ).getId();
     }
 
     public CandidateDto getById(UUID id) {
