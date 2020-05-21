@@ -6,4 +6,6 @@ public interface CandidateWithQuizStatusView {
     Candidate getCandidate();
 
     String getQuizStatus();
+
+    String getQuizTitle();
 }

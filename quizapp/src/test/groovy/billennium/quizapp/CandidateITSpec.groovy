@@ -61,6 +61,7 @@ class CandidateITSpec extends Specification {
                 .email(candidate.email)
                 .id(candidate.id.toString())
                 .quizStatus("READY")
+                .quizTitle("BIG-DATA")
                 .build()
 
         candidateEmailDto = CandidateToSaveDto.builder()

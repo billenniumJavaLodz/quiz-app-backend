@@ -47,6 +47,7 @@ public class CandidateService {
         if (queryResult.isPresent()) {
             CandidateDto candidateDto = new ModelMapper().map(queryResult.get().getCandidate(), CandidateDto.class);
             candidateDto.setQuizStatus(queryResult.get().getQuizStatus());
+            candidateDto.setQuizTitle(queryResult.get().getQuizTitle());
             return candidateDto;
         } else {
             return new CandidateDto();

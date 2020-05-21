@@ -37,6 +37,7 @@ public interface CandidateRepository extends JpaRepository<Candidate, UUID> {
             "where quizE.quizStatus='DONE' and c.id=:uuid")
     Optional<CandidateResultView> findCandidateWithResult(UUID uuid);
 
-    @Query(value = "SELECT c as candidate , quizE.quizStatus as quizStatus FROM Candidate  c join c.quizExecuted quizE  where c.id=:uuid")
+    @Query(value = "SELECT c as candidate , quizE.quizStatus as quizStatus, quiz.title as quizTitle" +
+            " FROM Candidate  c join c.quizExecuted quizE join quizE.quiz quiz  where c.id=:uuid")
     Optional<CandidateWithQuizStatusView> findByIdWithQuizStatus(UUID uuid);
 }

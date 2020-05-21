@@ -13,4 +13,5 @@ public class CandidateDto {
     private String id;
     private String email;
     private String quizStatus;
+    private String quizTitle;
 }
