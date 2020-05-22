@@ -4,6 +4,7 @@ import billennium.quizapp.controller.QuizController
 import billennium.quizapp.entity.*
 import billennium.quizapp.repository.*
 import billennium.quizapp.resource.candidate.CandidateResultDto
+import billennium.quizapp.resource.quiz.QuizResultPage
 import billennium.quizapp.utils.JsonTestUtil
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
@@ -11,8 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.web.servlet.MockMvc
 import spock.lang.Specification
 
-import static billennium.quizapp.controller.ControllerConstants.RESULT
-import static billennium.quizapp.controller.ControllerConstants.SLASH
+import static billennium.quizapp.controller.ControllerConstants.*
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
@@ -46,6 +46,10 @@ class ResultSpec extends Specification {
     def resultDto
 
     def candidate
+
+    def quizResultPage
+
+    def quizId;
 
     def setup() {
 
@@ -83,10 +87,29 @@ class ResultSpec extends Specification {
         resultDto = CandidateResultDto.builder()
                 .totalPoints(result.totalQuestions)
                 .scoredPoints(result.correctQuestions)
+                .scoreInPercentage(100l)
                 .quizTitle(quiz.title)
                 .id(candidate.id)
                 .email(candidate.email)
                 .build()
+
+        def candidateResult = CandidateResultDto.builder()
+                .quizTitle(quiz.title)
+                .email(candidate.email)
+                .id(candidate.id)
+                .totalPoints(userQuiz.result.totalQuestions)
+                .scoredPoints(userQuiz.result.correctQuestions)
+                .scoreInPercentage(100l)
+                .build()
+
+        quizResultPage = QuizResultPage.builder()
+                .pageNumber(0)
+                .pageSize(1)
+                .totalElements(1)
+                .candidateResults(Arrays.asList(candidateResult))
+                .build()
+
+        quizId = quiz.id;
 
     }
 
@@ -107,6 +130,17 @@ class ResultSpec extends Specification {
         def response = mockMvc.perform(get(RESULT + SLASH + uuid.get().id))
         then:
         response.andExpect(status().is2xxSuccessful()).andExpect(content().json(JsonTestUtil.asJsonString(resultDto)))
+    }
+
+    def " when get result/quiz/{id} with pageable paramas then return page of r quiz result"() {
+        given:
+        quizResultPage
+        quizId
+        when:
+        def response = mockMvc.perform(get(RESULT + QUIZ + SLASH + quizId).param("pageSize", "1")
+                .param("pageNumber", "0"))
+        then:
+        response.andExpect(status().is2xxSuccessful()).andExpect(content().json(JsonTestUtil.asJsonString(quizResultPage)))
     }
 
     def cleanup() {
