@@ -14,5 +14,5 @@ import java.util.List;
 @SuperBuilder(toBuilder = true)
 public class QuestionDto extends QuestionBaseDto {
     private List<AnswerDto> answers;
-
+    private byte[] image;
 }

@@ -141,7 +141,7 @@ public class QuizService {
         QuestionDto questionModel = new ModelMapper().map(question, QuestionDto.class);
         questionModel.setAnswers(answerDtoList);
         questionModel.setTimeToAnswer(question.getTimeToAnswerInSeconds());
-
+        questionModel.setImage(question.getImage());
         return QuizDefinitionDto.builder()
                 .id(quizExecutedId)
                 .question(questionModel)

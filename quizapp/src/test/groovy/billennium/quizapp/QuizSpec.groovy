@@ -87,6 +87,7 @@ class QuizSpec extends Specification {
                 .text("Testowe pytanie")
                 .timeToAnswerInSeconds(3)
                 .answers(Collections.emptyList())
+                .image("223".bytes)
                 .build())
         question.answers = Arrays.asList(answer)
         questionRepository.save(question)
@@ -119,6 +120,7 @@ class QuizSpec extends Specification {
         def questionDto = QuestionDto.builder()
                 .id(question.id)
                 .text(question.text)
+                .image(question.image)
                 .answers(Collections.singletonList(answerDto))
                 .timeToAnswer(question.timeToAnswerInSeconds)
                 .build()
@@ -185,6 +187,7 @@ class QuizSpec extends Specification {
                 .text(question.text)
                 .timeToAnswer(question.timeToAnswerInSeconds)
                 .answers(Arrays.asList(answerGetDto))
+                .image(question.image)
                 .build()
 
         quizGetDto = QuizGetDto.builder()
