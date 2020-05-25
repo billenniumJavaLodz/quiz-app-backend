@@ -29,6 +29,8 @@ public class Question extends BaseModel {
 
     private Integer timeToAnswerInSeconds;
 
+    private byte[] image;
+
     @ManyToMany(cascade = {
             CascadeType.PERSIST,
             CascadeType.MERGE

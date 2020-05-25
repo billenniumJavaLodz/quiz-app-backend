@@ -41,6 +41,7 @@ public class QuestionService {
         Question question = new ModelMapper().map(questionToSaveDto, Question.class);
         question.setTimeToAnswerInSeconds(questionToSaveDto.getTimeToAnswer());
         question.setAnswers(Collections.emptyList());
+        question.setImage(questionToSaveDto.getImage());
         questionRepository.save(question);
 
         question.setAnswers(answers);
@@ -100,6 +101,7 @@ public class QuestionService {
             checkAnswersExisting(answers);
             question.setAnswers(answers);
             question.setText(questionToUpdate.getText());
+            question.setImage(questionToUpdate.getImage());
             question.setTimeToAnswerInSeconds(questionToUpdate.getTimeToAnswer());
             questionRepository.save(question);
         });

@@ -63,6 +63,7 @@ class QuestionSpec extends Specification {
         question = questionRepository.save(Question.builder()
                 .text("TestQuestion")
                 .answers(Collections.emptyList())
+                .image("c2Rhc2RhZHNh".bytes)
                 .build())
         question.answers = Arrays.asList(answer)
         questionRepository.save(question)
@@ -78,6 +79,7 @@ class QuestionSpec extends Specification {
                 .text(question.text)
                 .timeToAnswer(question.timeToAnswerInSeconds)
                 .answers(Arrays.asList(answerDto))
+                .image(question.image)
                 .build()
 
         questionPageDto = QuestionPageDto.builder()

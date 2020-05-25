@@ -1,20 +1,17 @@
 package billennium.quizapp.resource.question;
 
 import billennium.quizapp.resource.answer.AnswerToSaveDto;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Value;
 
 import java.util.List;
 
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Value
 @Builder
 public class QuestionToSaveDto {
-    private List<AnswerToSaveDto> answers;
-    private Integer timeToAnswer;
-    private String text;
-    private String code;
+    List<AnswerToSaveDto> answers;
+    Integer timeToAnswer;
+    String text;
+    String code;
+    byte[] image;
 }
