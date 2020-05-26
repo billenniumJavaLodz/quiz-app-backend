@@ -1,6 +1,7 @@
 package billennium.quizapp.controller;
 
 import billennium.quizapp.resource.answer.AnswersDto;
+import billennium.quizapp.resource.quiz.QuizCategoryDto;
 import billennium.quizapp.resource.quiz.QuizDefinitionDto;
 import billennium.quizapp.resource.quiz.QuizEndDto;
 import billennium.quizapp.resource.quiz.QuizGetDto;
@@ -16,6 +17,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
+import static billennium.quizapp.controller.ControllerConstants.CATEGORY;
 import static billennium.quizapp.controller.ControllerConstants.ID_PARAM;
 import static billennium.quizapp.controller.ControllerConstants.QUIZ;
 import static billennium.quizapp.controller.ControllerConstants.STOP_QUIZ;
@@ -43,12 +47,18 @@ public class QuizController {
     }
 
     @GetMapping
-    public QuizPage getQuizzes(@RequestParam Integer pageSize, @RequestParam Integer pageNumber) {
-        return quizService.getQuizzes(pageSize, pageNumber);
+    public QuizPage getQuizzes(@RequestParam Integer pageSize, @RequestParam Integer pageNumber,
+                               @RequestParam String category) {
+        return quizService.getQuizzes(pageSize, pageNumber, category);
     }
 
     @GetMapping(ID_PARAM)
     public QuizGetDto getQuiz(@PathVariable Long id) {
         return quizService.getQuizById(id);
+    }
+
+    @GetMapping(CATEGORY)
+    public List<QuizCategoryDto> getQuizCategories() {
+        return quizService.getCategories();
     }
 }

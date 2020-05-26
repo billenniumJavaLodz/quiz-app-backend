@@ -11,6 +11,7 @@ public class ControllerConstants {
     public static final String STOP_QUIZ = "/stop";
     public static final String QUESTION = "/question";
     public static final String SLASH = "/";
+    public static final String CATEGORY = "/category";
 
     private ControllerConstants() {
         throw new IllegalStateException("Constants class");

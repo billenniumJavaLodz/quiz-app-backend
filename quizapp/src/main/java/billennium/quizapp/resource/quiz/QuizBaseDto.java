@@ -14,4 +14,5 @@ public class QuizBaseDto {
     private String title;
     private Integer numberOfQuestions;
     private Integer totalTime;
+    private String category;
 }

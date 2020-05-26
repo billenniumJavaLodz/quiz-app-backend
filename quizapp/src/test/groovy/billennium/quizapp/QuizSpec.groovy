@@ -18,6 +18,8 @@ import org.springframework.http.MediaType
 import org.springframework.test.web.servlet.MockMvc
 import spock.lang.Specification
 
+import java.util.stream.Collectors
+
 import static billennium.quizapp.controller.ControllerConstants.*
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
@@ -76,6 +78,8 @@ class QuizSpec extends Specification {
 
     def quizGetDto
 
+    def quizCategories
+
     def setup() {
 
         def answer = answerRepository.save(Answer.builder()
@@ -95,6 +99,7 @@ class QuizSpec extends Specification {
         def quiz = quizDefinitionRepository.save(QuizDefinition.builder()
                 .title("Java zestaw 1")
                 .questions(Collections.emptyList())
+                .category(QuizCategory.JAVA)
                 .build())
         quiz.questions = Arrays.asList(question)
         quizDefinitionRepository.save(quiz)
@@ -152,17 +157,20 @@ class QuizSpec extends Specification {
 
         questionBaseDto = QuestionBaseDto.builder()
                 .id(question.id)
+
                 .build()
 
         quizToSaveDto = QuizToSaveDto.builder()
                 .title("Test1")
                 .questions(Arrays.asList(questionBaseDto))
+                .category(QuizCategory.JAVA.name())
                 .build()
 
 
         def quizBaseDto = QuizBaseDto.builder()
                 .id(quiz.id)
                 .title(quiz.title)
+                .category(quiz.category.name())
                 .totalTime(question.timeToAnswerInSeconds)
                 .numberOfQuestions(quiz.questions.size())
                 .build()
@@ -193,11 +201,16 @@ class QuizSpec extends Specification {
         quizGetDto = QuizGetDto.builder()
                 .id(quiz.id)
                 .title(quiz.title)
+                .category(quiz.category.name())
                 .totalTime(question.timeToAnswerInSeconds)
                 .numberOfQuestions(quiz.getQuestions().size())
                 .questions(Arrays.asList(questionGetDto))
                 .build()
 
+        quizCategories = Arrays.stream(QuizCategory.values()).map({ quizCategory ->
+            QuizCategoryDto.builder().category(quizCategory.name()).build()
+        })
+                .collect(Collectors.toList());
     }
 
     def cleanup() {
@@ -281,7 +294,7 @@ class QuizSpec extends Specification {
         quizPage
         when:
         def response = mockMvc.perform(get(QUIZ).param("pageSize", "20")
-                .param("pageNumber", "0"))
+                .param("pageNumber", "0").param("category", "ALL"))
         then:
         response.andExpect(status().is2xxSuccessful())
                 .andExpect(content().json(JsonTestUtil.asJsonString(quizPage)))
@@ -298,4 +311,18 @@ class QuizSpec extends Specification {
                 .andExpect(content().json(JsonTestUtil.asJsonString(quizGetDto)))
 
     }
+
+    def "when get to /quiz with params and category  then return page of quizzes"() {
+        given:
+        quizPage
+        when:
+        def response = mockMvc.perform(get(QUIZ).param("pageSize", "20")
+                .param("pageNumber", "0").
+                param("category", "JAVA"))
+        then:
+        response.andExpect(status().is2xxSuccessful())
+                .andExpect(content().json(JsonTestUtil.asJsonString(quizPage)))
+    }
+
+
 }

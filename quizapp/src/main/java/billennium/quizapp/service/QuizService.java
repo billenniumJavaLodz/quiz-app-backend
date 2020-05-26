@@ -2,6 +2,7 @@ package billennium.quizapp.service;
 
 import billennium.quizapp.entity.Answer;
 import billennium.quizapp.entity.Question;
+import billennium.quizapp.entity.QuizCategory;
 import billennium.quizapp.entity.QuizDefinition;
 import billennium.quizapp.entity.QuizExecuted;
 import billennium.quizapp.entity.QuizStatus;
@@ -20,6 +21,7 @@ import billennium.quizapp.resource.answer.AnswersDto;
 import billennium.quizapp.resource.question.QuestionBaseDto;
 import billennium.quizapp.resource.question.QuestionDto;
 import billennium.quizapp.resource.quiz.QuizBaseDto;
+import billennium.quizapp.resource.quiz.QuizCategoryDto;
 import billennium.quizapp.resource.quiz.QuizDefinitionDto;
 import billennium.quizapp.resource.quiz.QuizEndDto;
 import billennium.quizapp.resource.quiz.QuizGetDto;
@@ -33,6 +35,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -43,6 +46,7 @@ import java.util.stream.Collectors;
 @Transactional
 public class QuizService {
 
+    private static final String DEFAULT_QUIZ_CATEGORY = "ALL";
     private final CandidateRepository candidateRepository;
     private final QuizExecutedRepository quizExecutedRepository;
     private final AnswerRepository answerRepository;
@@ -175,6 +179,7 @@ public class QuizService {
     public Long addQuiz(QuizToSaveDto quizToSaveDto) {
         return quizDefinitionRepository.save(QuizDefinition.builder()
                 .title(quizToSaveDto.getTitle())
+                .category(QuizCategory.valueOf(quizToSaveDto.getCategory()))
                 .questions(mapQuestions(quizToSaveDto.getQuestions())).build()
         ).getId();
     }
@@ -185,8 +190,13 @@ public class QuizService {
         ).collect(Collectors.toList());
     }
 
-    public QuizPage getQuizzes(Integer pageSize, Integer pageNumber) {
-        Page<QuizDefinition> quizDefinitionPage = quizDefinitionRepository.findAll(PageRequest.of(pageNumber, pageSize));
+    public QuizPage getQuizzes(Integer pageSize, Integer pageNumber, String category) {
+        Page<QuizDefinition> quizDefinitionPage;
+        if (category.equals(DEFAULT_QUIZ_CATEGORY)) {
+            quizDefinitionPage = quizDefinitionRepository.findAll(PageRequest.of(pageNumber, pageSize));
+        } else {
+            quizDefinitionPage = quizDefinitionRepository.findAllByCategory(QuizCategory.valueOf(category), PageRequest.of(pageNumber, pageSize));
+        }
         List<QuizBaseDto> quizBaseDtos = quizDefinitionPage.getContent().stream()
                 .map(quizDefinition -> {
                     QuizBaseDto quizBaseDto = new ModelMapper().map(quizDefinition, QuizBaseDto.class);
@@ -211,5 +221,11 @@ public class QuizService {
                     .mapToInt(Question::getTimeToAnswerInSeconds).sum());
             return quizGetDto;
         }).orElseGet(QuizGetDto::new);
+    }
+
+    public List<QuizCategoryDto> getCategories() {
+        return Arrays.stream(QuizCategory.values()).map(quizCategory ->
+                QuizCategoryDto.builder().category(quizCategory.name()).build())
+                .collect(Collectors.toList());
     }
 }

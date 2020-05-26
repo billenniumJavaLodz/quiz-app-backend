@@ -1,18 +1,15 @@
 package billennium.quizapp.resource.quiz;
 
 import billennium.quizapp.resource.question.QuestionBaseDto;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.Value;
 
 import java.util.List;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
+@Value
 @Builder
 public class QuizToSaveDto {
-    private String title;
-    private List<QuestionBaseDto> questions;
+    String title;
+    List<QuestionBaseDto> questions;
+    String category;
 }

@@ -8,6 +8,8 @@ import lombok.NoArgsConstructor;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.JoinColumn;
 import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
@@ -20,6 +22,9 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class QuizDefinition extends BaseModel {
+
+    @Enumerated(EnumType.STRING)
+    private QuizCategory category;
 
     @NotNull(message = "Please provide a name")
     @Column(columnDefinition = "TEXT")
