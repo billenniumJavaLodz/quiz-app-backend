@@ -29,6 +29,7 @@ import billennium.quizapp.resource.quiz.QuizPage;
 import billennium.quizapp.resource.quiz.QuizToSaveDto;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -43,7 +44,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+
 public class QuizService {
 
     private static final String DEFAULT_QUIZ_CATEGORY = "ALL";
@@ -56,7 +57,7 @@ public class QuizService {
     private static final long REQUEST_DELAY_TIME = 3;
     private static final long ANSWER_AFTER_TIME = 0;
     private static final int FIRST_QUESTION = 1;
-
+    @Transactional
     public QuizDefinitionDto begin(String candidateId, AnswersDto answersDto) {
         QuizExecutedView queryResult = candidateRepository.getCandidateWithQuiz(UUID.fromString(candidateId));
         if (queryResult != null) {
@@ -168,6 +169,7 @@ public class QuizService {
         return now.isBefore(timeLimit) || now.isEqual(timeLimit);
     }
 
+    @Transactional
     public void stopQuiz(QuizEndDto quizEndDto) {
         Optional<QuizExecuted> quizToStop = quizExecutedRepository.findById(quizEndDto.getQuizId());
         quizToStop.ifPresent(quiz -> {
@@ -227,5 +229,10 @@ public class QuizService {
         return Arrays.stream(QuizCategory.values()).map(quizCategory ->
                 QuizCategoryDto.builder().category(quizCategory.name()).build())
                 .collect(Collectors.toList());
+    }
+
+    @Transactional(rollbackFor = {DataIntegrityViolationException.class})
+    public void deleteQuizById(Long id) {
+        quizDefinitionRepository.findById(id).ifPresent(quizDefinitionRepository::delete);
     }
 }

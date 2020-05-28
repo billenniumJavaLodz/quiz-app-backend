@@ -21,8 +21,7 @@ import spock.lang.Specification
 import java.util.stream.Collectors
 
 import static billennium.quizapp.controller.ControllerConstants.*
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
@@ -79,6 +78,8 @@ class QuizSpec extends Specification {
     def quizGetDto
 
     def quizCategories
+
+    def quizToDelete
 
     def setup() {
 
@@ -209,8 +210,15 @@ class QuizSpec extends Specification {
 
         quizCategories = Arrays.stream(QuizCategory.values()).map({ quizCategory ->
             QuizCategoryDto.builder().category(quizCategory.name()).build()
-        })
-                .collect(Collectors.toList());
+        }).collect(Collectors.toList())
+
+        quizToDelete = quizDefinitionRepository.save(QuizDefinition.builder()
+                .title("Zestaw 2")
+                .questions(Collections.emptyList())
+                .category(QuizCategory.FRONT_END)
+                .build())
+        quizToDelete.questions = Arrays.asList(question)
+        quizDefinitionRepository.save(quizToDelete)
     }
 
     def cleanup() {
@@ -294,7 +302,7 @@ class QuizSpec extends Specification {
         quizPage
         when:
         def response = mockMvc.perform(get(QUIZ).param("pageSize", "20")
-                .param("pageNumber", "0").param("category", "ALL"))
+                .param("pageNumber", "0").param("category", "JAVA"))
         then:
         response.andExpect(status().is2xxSuccessful())
                 .andExpect(content().json(JsonTestUtil.asJsonString(quizPage)))
@@ -324,5 +332,22 @@ class QuizSpec extends Specification {
                 .andExpect(content().json(JsonTestUtil.asJsonString(quizPage)))
     }
 
+    def "when delete quiz then resposne http status 204"() {
+        given:
+        quizToDelete
+        when:
+        def response = mockMvc.perform(delete(QUIZ + SLASH + quizToDelete.id))
+        then:
+        response.andExpect(status().isNoContent())
+    }
 
+
+    def "when delete solved quiz then resposne http status 409"() {
+        given:
+        quizDefinitionId
+        when:
+        def response = mockMvc.perform(delete(QUIZ + SLASH + quizDefinitionId))
+        then:
+        response.andExpect(status().isConflict())
+    }
 }
